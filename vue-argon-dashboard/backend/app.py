@@ -47,7 +47,7 @@ def signup():
     data = request.json
     user_no = data.get('userNo')
     user_name = data.get('userName')
-    password = hash_password(data.get('password', ''))
+    password = hash_password(data.get('password', '')) #hasing the password
     branch_id = data.get('branchId')
     auth_code = data.get('authCode')
 

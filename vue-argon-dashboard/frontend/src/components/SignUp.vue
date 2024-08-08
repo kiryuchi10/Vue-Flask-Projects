@@ -1,35 +1,48 @@
 <template>
-  <div class="signup-container">
-    <h1>Signup</h1>
-    <form @submit.prevent="handleSignUp" class="signup-form">
-      <div class="form-group">
-        <input type="text" v-model="userNo" placeholder="User Number" required />
-      </div>
-      <div class="form-group">
-        <input type="text" v-model="userName" placeholder="User Name" required />
-      </div>
-      <div class="form-group">
-        <input type="password" v-model="password" placeholder="Password" required />
-      </div>
-      <div class="form-group">
-        <input type="text" v-model="branchId" placeholder="Branch ID" required />
-      </div>
-      <div class="form-group">
-        <input type="text" v-model="authCode" placeholder="Auth Code" required />
-      </div>
-      <div class="form-group">
-        <button type="submit">Sign Up</button>
-      </div>
-      <div class="form-group">
-        <button type="button" @click="navigateHome">Go to Home</button>
-      </div>
-    </form>
-  </div>
+  <v-container>
+    <v-row justify="center" align="center" class="signup-container">
+      <v-col cols="12" md="6" lg="4">
+        <v-card>
+          <v-card-title class="text-h5">Signup</v-card-title>
+          <v-card-text>
+            <v-form @submit.prevent="handleSignUp">
+              <v-text-field
+                v-model="userNo"
+                label="User Number"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="userName"
+                label="User Name"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="password"
+                label="Password"
+                type="password"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="branchId"
+                label="Branch ID"
+                required
+              ></v-text-field>
+              <v-text-field
+                v-model="authCode"
+                label="Auth Code"
+                required
+              ></v-text-field>
+              <v-btn type="submit" color="primary" class="mt-4">Sign Up</v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
-import axios from '../axios';
-
+import axios from 'axios';
 
 export default {
   name: 'SignupPage',
@@ -45,59 +58,37 @@ export default {
   methods: {
     async handleSignUp() {
       try {
-        const response = await axios.post('/signup', {
+        const response = await axios.post('http://localhost:5000/signup', {
           userNo: this.userNo,
           userName: this.userName,
           password: this.password,
           branchId: this.branchId,
           authCode: this.authCode
         });
-        console.log(response.data);
+        alert(response.data.message);
       } catch (error) {
-        console.error(error);
+        alert('Signup failed: ' + error.response.data.message);
       }
-    },
-    navigateHome() {
-      this.$router.push('/'); // Use this.$router to navigate
     }
   }
 };
 </script>
 
 <style scoped>
+/* Container styling */
 .signup-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  min-height: 100vh;
   padding: 20px;
 }
 
-.signup-form {
-  display: flex;
-  flex-direction: column;
+/* Card styling */
+.v-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Button styling */
+.v-btn {
   width: 100%;
-  max-width: 400px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group input,
-.form-group button {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-}
-
-.form-group button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-.form-group button:hover {
-  background-color: #0056b3;
 }
 </style>
