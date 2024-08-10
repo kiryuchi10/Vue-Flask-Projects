@@ -4,6 +4,7 @@
     "http-proxy-middleware": "^3.0.0",
     "react-app": "^1.1.2",
     "react-router-dom": "^6.26.0",
+    "react-scripts": "^5.0.1",
     "vue": "^3.4.36"
   }
 }
