@@ -82,10 +82,11 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
 # Enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}})
+#CORS(app, resources={r'/*': {'origins': '*'}})
+CORS(app)
 
 # Sanity check route
-@app.route('/', methods=['GET'])
+@app.route('/test', methods=['GET'])
 def test_router():
     return jsonify('This is Docker Test developments Server!')
 
@@ -102,4 +103,4 @@ def health_check():
     return jsonify('good')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('FLASK_RUN_PORT', 5000)), debug=bool(os.getenv('FLASK_DEBUG', True)))
+    app.run(host='0.0.0.0', port=5000, debug=True)
