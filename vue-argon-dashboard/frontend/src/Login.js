@@ -14,6 +14,7 @@ const Login = ({ setMessage }) => {
                 },
                 body: JSON.stringify({ userName, password })
             });
+
             if (response.ok) {
                 const data = await response.json();
                 setMessage(`Login successful: ${data.userName}`);
