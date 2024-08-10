@@ -1,243 +1,135 @@
 <template>
-  <v-app>
-    <v-container fluid>
-      <!-- Header -->
-      <v-app-bar app>
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-        <v-toolbar-title>
-          <img src="@/assets/logo.png" alt="App Logo" height="40">
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          prepend-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
-        <v-app-bar-nav-icon @click="showMenu = !showMenu"></v-app-bar-nav-icon>
-        
-        <!-- Profile Icon -->
-        <v-avatar
-          class="ml-4"
-          @click="handleProfileClick"
-          :color="isAuthenticated ? 'primary' : 'grey lighten-1'"
-          style="cursor: pointer;"
-        >
-          <v-icon>mdi-account</v-icon>
-          <!-- Display user initials or avatar image if authenticated -->
-          <template v-if="isAuthenticated">
-            <span>{{ userInitials }}</span>
-          </template>
-        </v-avatar>
-      </v-app-bar>
+  <v-app id="inspire">
+    <v-navigation-drawer :width="195" v-model="drawer">
+      <v-list-item title="My Application" subtitle="Vuetify"></v-list-item>
+      <v-divider></v-divider>
+      <v-list-item link title="List Item 1"></v-list-item>
+      <v-list-item link title="List Item 2"></v-list-item>
+      <v-list-item link title="List Item 3"></v-list-item>
+    </v-navigation-drawer>
 
-      <!-- Drawer Menu -->
-      <v-navigation-drawer v-model="drawer" app>
-        <v-list dense>
-          <v-list-item-group>
-            <v-list-item @click="navigateTo('home')">
-              <v-list-item-icon>
-                <v-icon>mdi-home</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Home</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item @click="navigateTo('profile')" :disabled="!isAuthenticated">
-              <v-list-item-icon>
-                <v-icon>mdi-account</v-icon>
-              </v-list-item-icon>
-              <v-list-item-content>
-                <v-list-item-title>Profile</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <!-- Add more menu items as needed -->
-          </v-list-item-group>
-        </v-list>
-      </v-navigation-drawer>
+    <v-app-bar>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <!-- Main Banner -->
-      <v-carousel
-        cycle
-        hide-delimiter-background
-        height="400px"
-        :items="bannerItems"
-      >
-        <v-carousel-item
-          v-for="item in bannerItems"
-          :key="item.src"
-          :src="item.src"
-        >
-          <v-container fill-height>
-            <v-layout
-              align-center
-              justify-center
-              column
-              class="text-center"
-            >
-              <v-card class="pa-5" outlined>
-                <v-card-title class="headline">{{ item.title }}</v-card-title>
-                <v-card-subtitle>{{ item.subtitle }}</v-card-subtitle>
-                <v-card-actions>
-                  <v-btn color="primary" @click="readMore(item.link)">Read More</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-layout>
-          </v-container>
-        </v-carousel-item>
-      </v-carousel>
+      <v-app-bar-title>Application</v-app-bar-title>
 
-      <!-- Main Content -->
-      <v-container>
-        <!-- Top Stories -->
-        <v-row>
-          <v-col
-            v-for="story in topStories"
-            :key="story.id"
-            cols="12"
-            md="4"
-          >
-            <v-card>
-              <v-img :src="story.image" height="200px"></v-img>
-              <v-card-title>{{ story.title }}</v-card-title>
-              <v-card-subtitle>{{ story.summary }}</v-card-subtitle>
-              <v-card-actions>
-                <v-btn @click="readMore(story.link)">Read More</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
+      <v-spacer></v-spacer>
 
-        <!-- Trending Now -->
-        <v-divider></v-divider>
-        <v-subheader>Trending Now</v-subheader>
-        <v-list>
-          <v-list-item
-            v-for="trend in trendingNow"
-            :key="trend.id"
-            @click="readMore(trend.link)"
-          >
-            <v-list-item-content>
-              <v-list-item-title>{{ trend.title }}</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+      <v-btn icon>
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
 
-        <!-- Recommended For You -->
-        <v-divider></v-divider>
-        <v-subheader>Recommended For You</v-subheader>
-        <v-row>
-          <v-col
-            v-for="recommendation in recommendations"
-            :key="recommendation.id"
-            cols="12"
-            md="4"
-          >
-            <v-card>
-              <v-img :src="recommendation.image" height="200px"></v-img>
-              <v-card-title>{{ recommendation.title }}</v-card-title>
-              <v-card-subtitle>{{ recommendation.summary }}</v-card-subtitle>
-              <v-card-actions>
-                <v-btn @click="readMore(recommendation.link)">Read More</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
+      <v-btn icon>
+        <v-icon>mdi-heart</v-icon>
+      </v-btn>
 
-      <!-- Footer -->
-      <v-footer app>
-        <v-container>
-          <v-row>
-            <v-col>
-              <v-list dense>
-                <v-list-item @click="navigateTo('about')">
-                  <v-list-item-content>About Us</v-list-item-content>
-                </v-list-item>
-                <v-list-item @click="navigateTo('contact')">
-                  <v-list-item-content>Contact Us</v-list-item-content>
-                </v-list-item>
-                <!-- Add more footer links as needed -->
-              </v-list>
-            </v-col>
-            <v-col class="text-right">
-              <v-btn @click="subscribeNewsletter">Subscribe to Newsletter</v-btn>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-footer>
-    </v-container>
+      <v-btn icon>
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-sheet
+      class="d-flex align-center justify-center flex-wrap text-center mx-auto px-4"
+      elevation="4"
+      height="250"
+      max-width="800"
+      width="100%"
+      rounded
+    >
+      <div>
+        <h2 class="text-h4 font-weight-black text-orange">Congratulations!</h2>
+
+        <div class="text-h5 font-weight-medium mb-2">
+          You are officially a part of the Vuetify Community!
+        </div>
+
+        <p class="text-body-2 mb-4">
+          Please head over to your inbox/spam or others folder to find our
+          verificaiton email.
+        </p>
+
+        <v-btn color="orange" variant="text">Go to Login</v-btn>
+      </div>
+    </v-sheet>
+
+    <v-main>
+      <!--  -->
+    </v-main>
+
+    <v-carousel>
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+        cover
+      ></v-carousel-item>
+
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/hotel.jpg"
+        cover
+      ></v-carousel-item>
+
+      <v-carousel-item
+        src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
+        cover
+      ></v-carousel-item>
+    </v-carousel>
+
+    <v-footer class="bg-indigo-lighten-1 text-center d-flex flex-column">
+      <div>
+        <v-btn
+          v-for="icon in icons"
+          :key="icon"
+          :icon="icon"
+          class="mx-4"
+          variant="text"
+        ></v-btn>
+      </div>
+
+      <div class="pt-0">
+        Phasellus feugiat arcu sapien, et iaculis ipsum elementum sit amet.
+        Mauris cursus commodo interdum. Praesent ut risus eget metus luctus
+        accumsan id ultrices nunc. Sed at orci sed massa consectetur dignissim a
+        sit amet dui. Duis commodo vitae velit et faucibus. Morbi vehicula
+        lacinia malesuada. Nulla placerat augue vel ipsum ultrices, cursus
+        iaculis dui sollicitudin. Vestibulum eu ipsum vel diam elementum tempor
+        vel ut orci. Orci varius natoque penatibus et magnis dis parturient
+        montes, nascetur ridiculus mus.
+      </div>
+
+      <v-divider></v-divider>
+
+      <div>{{ new Date().getFullYear() }} — <strong>Vuetify</strong></div>
+    </v-footer>
+
+    <v-bottom-navigation>
+      <v-btn value="recent">
+        <v-icon>mdi-history</v-icon>
+
+        <span>Recent</span>
+      </v-btn>
+
+      <v-btn value="favorites">
+        <v-icon>mdi-heart</v-icon>
+
+        <span>Favorites</span>
+      </v-btn>
+
+      <v-btn value="nearby">
+        <v-icon>mdi-map-marker</v-icon>
+
+        <span>Nearby</span>
+      </v-btn>
+    </v-bottom-navigation>
   </v-app>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
+import { ref } from "vue";
 
-const router = useRouter();
-const store = useStore();
-
-const drawer = ref(false);
-const showMenu = ref(false);
-const search = ref('');
-const bannerItems = ref([
-  { src: 'https://via.placeholder.com/800x400', title: 'Featured Story 1', subtitle: 'Subtitle for story 1', link: '#' },
-  { src: 'https://via.placeholder.com/800x400', title: 'Featured Story 2', subtitle: 'Subtitle for story 2', link: '#' }
-]);
-
-const topStories = ref([
-  { id: 1, title: 'Top Story 1', summary: 'Summary for top story 1', image: 'https://via.placeholder.com/300x200', link: '#' },
-  { id: 2, title: 'Top Story 2', summary: 'Summary for top story 2', image: 'https://via.placeholder.com/300x200', link: '#' }
-]);
-
-const trendingNow = ref([
-  { id: 1, title: 'Trending Story 1', link: '#' },
-  { id: 2, title: 'Trending Story 2', link: '#' }
-]);
-
-const recommendations = ref([
-  { id: 1, title: 'Recommended Story 1', summary: 'Summary for recommended story 1', image: 'https://via.placeholder.com/300x200', link: '#' },
-  { id: 2, title: 'Recommended Story 2', summary: 'Summary for recommended story 2', image: 'https://via.placeholder.com/300x200', link: '#' }
-]);
-
-const isAuthenticated = computed(() => store.state.isAuthenticated);
-const userInitials = computed(() => {
-  const user = store.state.user; // Adjust according to your store
-  return user ? `${user.firstName[0]}${user.lastName[0]}` : '';
-});
-
-function handleProfileClick() {
-  if (isAuthenticated.value) {
-    router.push('/profile'); // Redirect to profile page if authenticated
-  } else {
-    router.push('/login'); // Redirect to login page if not authenticated
-  }
-}
-
-function navigateTo(page) {
-  if (page === 'profile' && !isAuthenticated.value) {
-    router.push('/login'); // Redirect to login if not authenticated
-  } else {
-    router.push(`/${page}`);
-  }
-}
-
-function readMore(link) {
-  window.open(link, '_blank');
-}
-
-function subscribeNewsletter() {
-  console.log('Subscribing to newsletter');
-}
+const drawer = ref(null);
 </script>
 
-<style scoped>
-.v-footer {
-  background-color: #f5f5f5;
-}
-.v-avatar {
-  cursor: pointer;
-}
-</style>
+<script>
+export default {
+  data: () => ({ drawer: null }),
+};
+</script>

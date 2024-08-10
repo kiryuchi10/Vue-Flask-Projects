@@ -1,41 +1,15 @@
-// router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from '@/components/HomePage.vue';
-import UserLogin from '@/components/UserLogin.vue';
-import SignUp from '@/components/SignUp.vue';
-import Profile from '@/components/ProfilePage.vue';
-import MainLayout from '@/views/MainLayout.vue';
-import store from '@/store'; // Import Vuex store
+import LoginPage from '../components/UserLogin.vue';
+import SignupPage from '../components/SignUp.vue';
 
 const routes = [
-  {
-    path: '/',
-    component: MainLayout,
-    children: [
-      { path: '', component: HomePage },
-      { path: 'login', component: UserLogin },
-      { path: 'signup', component: SignUp },
-      {
-        path: 'profile',
-        component: Profile,
-        meta: { requiresAuth: true },
-      },
-    ],
-  },
+  { path: '/login', component: LoginPage },
+  { path: '/signup', component: SignupPage }
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
-});
-
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = store.state.isAuthenticated;
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
-  } else {
-    next();
-  }
+  routes
 });
 
 export default router;
