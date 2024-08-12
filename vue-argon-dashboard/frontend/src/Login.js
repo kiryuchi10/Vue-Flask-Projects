@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
-const Login = ({ setMessage }) => {
+const Login = () => {  // Fixed the syntax error
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState(''); // Correctly initialized
 
     const handleLogin = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent default form submission
         try {
             const response = await fetch('/login', {
                 method: 'POST',
@@ -46,6 +47,7 @@ const Login = ({ setMessage }) => {
                 />
                 <button type="submit">Login</button>
             </form>
+            {message && <p>{message}</p>}  {/* Display the message */}
         </div>
     );
 };
