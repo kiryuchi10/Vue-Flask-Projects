@@ -88,22 +88,22 @@ function App() {
 
     switch (newValue) {
       case 0:
-        navigate("/explore"); // Navigate to Explore page
+        navigate('/explore');
         break;
       case 1:
-        navigate("/MainPage"); // Navigate to Home page
+        navigate('/home');
         break;
       case 2:
-        navigate("/go"); // Navigate to Go page
+        navigate('/go');
         break;
       case 3:
-        navigate("/favorites"); // Navigate to Favorites page
+        navigate('/favorites');
         break;
       case 4:
-        navigate("/login"); // Navigate to Profile page
+        navigate('/login');
         break;
       default:
-        navigate("/");
+        navigate('/');
     }
   };
   const settings = {
@@ -214,7 +214,7 @@ function App() {
               </Box>
               <IconButton edge="end" color="inherit">
                 <span onClick={toggleDrawer} style={{ cursor: "pointer" }}>
-                  ☰
+                  🛒
                 </span>
               </IconButton>
             </Toolbar>

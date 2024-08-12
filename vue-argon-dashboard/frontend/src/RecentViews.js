@@ -1,24 +1,37 @@
-// RecentViews.js
-import React from 'react';
+import React from "react";
+import { Box, Grid, Typography } from "@mui/material";
 
-const RecentViews = ({ recentItems }) => {
+function RecentViews({ recentItems }) {
   return (
-    <div className="recent-views">
-      <h2>Recent Views</h2>
-      <div className="recent-items">
-        {recentItems.length > 0 ? (
-          recentItems.map((item, index) => (
-            <div key={index} className="recent-item">
-              <img src={item.image} alt={item.alt} style={{ width: '100px', height: 'auto' }} />
-              <p>{item.title}</p>
-            </div>
-          ))
-        ) : (
-          <p>No recent views</p>
-        )}
-      </div>
-    </div>
+    <Box sx={{ p: 2 }}>
+      <Grid container spacing={2}>
+        {recentItems.map((item, index) => (
+          <Grid item xs={12} md={6} key={index}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                p: 2,
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                backgroundColor: "#f9f9f9",
+              }}
+            >
+              <img
+                src={item.image}
+                alt={item.alt}
+                style={{ width: "100%", borderRadius: "8px" }}
+              />
+              <Typography variant="h6" sx={{ mt: 2 }}>
+                {item.title}
+              </Typography>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
-};
+}
 
 export default RecentViews;
