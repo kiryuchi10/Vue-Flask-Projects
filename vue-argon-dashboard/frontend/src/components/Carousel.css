@@ -1,0 +1,50 @@
+/* Carousel.css */
+
+.carousel-container {
+    width: 100%;
+    max-width: 1200px; /* Adjust max-width as needed */
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  .carousel-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .carousel-image {
+    width: 100%; /* Makes the image fit the container */
+    height: auto;
+    border-radius: 8px; /* Rounded corners for images */
+  }
+  
+  /* Customizing slick-dots for a cleaner look */
+  .slick-dots {
+    bottom: 10px; /* Position dots at the bottom */
+  }
+  
+  .slick-dots li button:before {
+    color: #fff; /* Dot color */
+    font-size: 12px; /* Dot size */
+  }
+  
+  .slick-dots li.slick-active button:before {
+    color: #007bff; /* Active dot color */
+  }
+  
+  /* Simplifying the arrows */
+  .slick-prev, .slick-next {
+    font-size: 20px; /* Size of the arrows */
+    color: #007bff; /* Arrow color */
+    z-index: 1; /* Ensures arrows are above other content */
+  }
+  
+  .slick-prev {
+    left: 10px; /* Position left arrow */
+  }
+  
+  .slick-next {
+    right: 10px; /* Position right arrow */
+  }
+  

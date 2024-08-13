@@ -1,0 +1,8 @@
+/* BottomNavigation.css */
+.bottom-nav-container {
+    width: 100%;
+    max-width: 1200px; /* Same max-width as carousel */
+    margin: 0 auto;
+    position: relative;
+  }
+  

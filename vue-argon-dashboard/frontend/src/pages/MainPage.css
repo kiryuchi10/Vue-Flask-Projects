@@ -1,0 +1,33 @@
+/* MainPage.css */
+.main-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
+}
+
+.main-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.data-display {
+  margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .main-page-content {
+    padding: 15px;
+    width: 100%;
+  }
+}
