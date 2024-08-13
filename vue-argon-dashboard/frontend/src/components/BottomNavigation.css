@@ -1,8 +1,42 @@
-/* BottomNavigation.css */
-.bottom-nav-container {
-    width: 100%;
-    max-width: 1200px; /* Same max-width as carousel */
-    margin: 0 auto;
-    position: relative;
-  }
-  
+/* BottomNav.css */
+
+/* Container for the bottom navigation bar */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around; /* Distribute items evenly */
+  align-items: center;
+  background-color: #333; /* Background color of the nav bar */
+  height: 56px; /* Adjust height as needed */
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1000; /* Ensure it is on top of other elements */
+}
+
+/* Style for each navigation item */
+.bottom-nav .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff; /* Text/icon color */
+  text-decoration: none; /* Remove underline from links */
+  font-size: 14px; /* Adjust font size as needed */
+  padding: 10px; /* Adjust padding to fit items */
+}
+
+/* Style for icons inside navigation items */
+.bottom-nav .nav-item .icon {
+  font-size: 24px; /* Adjust icon size as needed */
+}
+
+/* Style for text labels */
+.bottom-nav .nav-item .label {
+  font-size: 12px; /* Adjust text size for labels */
+  margin-top: 4px; /* Space between icon and label */
+}
+
+/* Hover effect */
+.bottom-nav .nav-item:hover {
+  background-color: #555; /* Example hover background */
+}

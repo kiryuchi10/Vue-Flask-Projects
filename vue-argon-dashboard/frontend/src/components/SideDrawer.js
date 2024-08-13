@@ -1,21 +1,21 @@
+// SideDrawer.jsx
 import React from 'react';
-import { Drawer, IconButton, List, ListItem, ListItemText } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Drawer, List, ListItem, ListItemText } from '@mui/material';
 
-const SideDrawer = ({ open, onClose }) => (
-  <Drawer anchor="left" open={open} onClose={onClose}>
-    <div style={{ width: 250 }}>
-      <IconButton onClick={onClose} style={{ margin: 16 }}>
-        <CloseIcon />
-      </IconButton>
+const SideDrawer = ({ open, onClose }) => {
+  return (
+    <Drawer anchor="left" open={open} onClose={onClose}>
       <List>
-        <ListItem button>
-          <ListItemText primary="Settings" />
+        <ListItem button onClick={onClose}>
+          <ListItemText primary="Item 1" />
         </ListItem>
-        {/* Additional items can be added here */}
+        <ListItem button onClick={onClose}>
+          <ListItemText primary="Item 2" />
+        </ListItem>
+        {/* Add more items as needed */}
       </List>
-    </div>
-  </Drawer>
-);
+    </Drawer>
+  );
+};
 
 export default SideDrawer;

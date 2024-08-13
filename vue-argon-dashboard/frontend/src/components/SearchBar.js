@@ -7,7 +7,7 @@ const SearchBar = () => {
     <TextField
       variant="outlined"
       fullWidth
-      placeholder="Search..."
+      placeholder="오늘은 뭐할까?"
     />
   );
 };

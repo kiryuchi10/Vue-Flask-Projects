@@ -2,25 +2,24 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Signup = () => {
-    const [userNo, setUserNo] = useState('');
     const [userName, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [branchId, setBranchId] = useState('');
-    const [authCode, setAuthCode] = useState('');
+    const [email, setEmail] = useState('');  // New state for email
 
     const handleSignup = () => {
         axios.post('/signup', {
-            userNo: userNo,
             userName: userName,
             password: password,
             branchId: branchId,
-            authCode: authCode
+            email: email   // Include email in the request payload
         })
         .then(response => {
-            alert(response.data);
+            alert(response.data.message);
         })
         .catch(error => {
-            console.error(error);
+            console.error('There was an error signing up!', error);
+            alert('Error: ' + error.response.data.message);
         });
     };
 
@@ -28,16 +27,16 @@ const Signup = () => {
         <div className="signup">
             <h2>Sign Up</h2>
             <input
-                type="number"
-                placeholder="User Number"
-                onChange={(e) => setUserNo(e.target.value)}
-                value={userNo}
-            />
-            <input
                 type="text"
                 placeholder="User Name"
                 onChange={(e) => setUserName(e.target.value)}
                 value={userName}
+            />
+            <input
+                type="email"   // Input type email for email address
+                placeholder="Email"
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
             />
             <input
                 type="password"
@@ -50,12 +49,6 @@ const Signup = () => {
                 placeholder="Branch ID"
                 onChange={(e) => setBranchId(e.target.value)}
                 value={branchId}
-            />
-            <input
-                type="text"
-                placeholder="Auth Code"
-                onChange={(e) => setAuthCode(e.target.value)}
-                value={authCode}
             />
             <button onClick={handleSignup}>Sign Up</button>
         </div>

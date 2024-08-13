@@ -1,0 +1,13 @@
+.calendar-date-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
+  }
+  
+  .calendar-date-page h2 {
+    margin-bottom: 20px;
+  }
+  

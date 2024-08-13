@@ -1,0 +1,93 @@
+/* General container styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px; /* Adjust padding to use space effectively */
+  box-sizing: border-box; /* Ensure padding is included in width/height */
+}
+
+/* AppBar styles */
+.app-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px; /* Adjust padding to reduce space */
+  height: 40px; /* Adjust height to make it tighter */
+  background-color: #333; /* Example background color */
+}
+
+.app-bar .logo {
+  font-size: 18px; /* Adjust font size to fit space */
+  color: #fff;
+}
+
+.app-bar .drawer-toggle,
+.app-bar .notification-icon {
+  font-size: 20px; /* Adjust icon size */
+}
+
+/* Bottom Navigation styles */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #333;
+  height: 50px; /* Adjust height to fit items */
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.bottom-nav .nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px; /* Reduce font size */
+  padding: 5px; /* Reduce padding */
+}
+
+.bottom-nav .nav-item .icon {
+  font-size: 20px; /* Adjust icon size */
+}
+
+.bottom-nav .nav-item .label {
+  font-size: 10px; /* Smaller text size */
+}
+
+/* MainPage styles */
+.main-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align items at the top */
+  width: 100%;
+  min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
+}
+
+.main-page-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px; /* Reduced padding */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Dimmer shadow */
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 600px) {
+  .bottom-nav .nav-item .icon {
+    font-size: 18px; /* Smaller icon size on small screens */
+  }
+
+  .bottom-nav .nav-item .label {
+    font-size: 8px; /* Smaller text size on small screens */
+  }
+}

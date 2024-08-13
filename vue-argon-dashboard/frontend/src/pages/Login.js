@@ -22,10 +22,17 @@ const Login = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                setMessage(`Login successful: ${data.userName}`);
+                
+                // Assuming the server responds with a token
+                const { token } = data;
+                
+                // Store token in local storage
+                localStorage.setItem('authToken', token);
+
+                setMessage('Login successful');
                 
                 // Redirect to main page
-                navigate('/mainpage'); 
+                navigate('/mainpage');
             } else {
                 const errorText = await response.text(); // Get error text from response
                 setMessage(`Login failed: ${errorText}`);

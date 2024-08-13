@@ -1,0 +1,19 @@
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
+  }
+  
+  .calendar-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  .react-calendar {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomNavigation, BottomNavigationAction, Box } from '@mui/material';
-import ExploreIcon from '@mui/icons-material/Explore';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import Calendar icon
 import HomeIcon from '@mui/icons-material/Home';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import PersonIcon from '@mui/icons-material/Person';
@@ -11,7 +11,7 @@ const BottomNav = () => {
 
   // Function to handle navigation when the Profile icon is clicked
   const handleProfileClick = () => {
-    navigate('/login'); // Navigate to the Login page
+    navigate('/profilepage'); // Navigate to the Profile page
   };
 
   // Function to handle navigation when the Go button is clicked
@@ -21,6 +21,11 @@ const BottomNav = () => {
 
   const handleHomeClick = () => {
     navigate('/mainpage'); // Navigate to MainPage
+  };
+
+  // Function to handle navigation when the Calendar icon is clicked
+  const handleCalendarClick = () => {
+    navigate('/calendar'); // Navigate to the Calendar page
   };
 
   return (
@@ -36,7 +41,11 @@ const BottomNav = () => {
         borderTop: '1px solid #e0e0e0', // Light border for visual separation
       }}
     >
-      <BottomNavigationAction label="Explore" icon={<ExploreIcon />} />
+      <BottomNavigationAction
+        label="Calendar"
+        icon={<CalendarTodayIcon />} // Use Calendar icon
+        onClick={handleCalendarClick} // Add click handler for Calendar
+      />
       <BottomNavigationAction
         label="Home"
         icon={<HomeIcon />}
