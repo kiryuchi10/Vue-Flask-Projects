@@ -3,10 +3,17 @@ import './MainPage.css'; // Import the CSS file
 import SpeechToText from '../components/SpeechToText'; // Import the SpeechToText component
 
 const MainPage = () => {
-  const [response, setResponse] = useState('');
+  const [messages, setMessages] = useState([]); // Store the conversation messages
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleTextSubmit = async (text) => {
+    if (text.trim() === '') return;
+
+    // Add the user's message to the conversation
+    const userMessage = { sender: 'user', text: text };
+    setMessages([...messages, userMessage]);
+    setInput('');
     setLoading(true); // Start loading
 
     try {
@@ -21,37 +28,55 @@ const MainPage = () => {
       if (!res.ok) {
         const errorMessage = await res.text();
         console.error('Error:', errorMessage);
-        setResponse('Error processing your request.'); // Display error message
+        const botMessage = { sender: 'bot', text: 'Error processing your request.' };
+        setMessages((prevMessages) => [...prevMessages, botMessage]);
         return;
       }
 
       const data = await res.json();
-      setResponse(data.response); // Set the bot's response
+      const botMessage = { sender: 'bot', text: data.response };
+
+      // Add the bot's response to the conversation
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
     } catch (error) {
       console.error('Fetch error:', error);
-      setResponse('An error occurred while processing your request.'); // Display catch error
+      const botMessage = { sender: 'bot', text: 'An error occurred while processing your request.' };
+      setMessages((prevMessages) => [...prevMessages, botMessage]);
     } finally {
       setLoading(false); // End loading
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleTextSubmit(input);
+  };
+
   return (
     <div className="main-page-container">
-      <div className="main-page-content">
-        <h1>Welcome to the Main Page</h1>
-        <p>This is the central content of the main page.</p>
-        
-        {/* Integrate the SpeechToText component */}
-        <SpeechToText onTextSubmit={handleTextSubmit} />
-        
-        {/* Display the buffering bar while loading */}
-        {loading && <div className="buffering-bar"></div>}
 
-        {/* Display the response from the chatbot */}
-        <div className="chatgpt-response">
-          <h2>Response from the Chatbot:</h2>
-          <p>{response}</p>
+      {/* Integrate the SpeechToText component (Voicegram) */}
+      <SpeechToText onTextSubmit={handleTextSubmit} />
+
+      <div className="chat-box">
+        <div className="messages-container">
+          {messages.map((message, index) => (
+            <div key={index} className={`message ${message.sender}`}>
+              {message.text}
+            </div>
+          ))}
+          {loading && <div className="message bot">Typing...</div>}
         </div>
+        <form onSubmit={handleSubmit} className="input-form">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="input-field"
+          />
+          <button type="submit" className="send-button">Send</button>
+        </form>
       </div>
     </div>
   );

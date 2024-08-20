@@ -13,6 +13,10 @@ import secrets
 import os
 from transformers import pipeline
 
+from scipy.io import wavfile
+import pandas as pd
+from io import BytesIO
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -347,6 +351,47 @@ def chat():
     except Exception as e:
         print(f"Error during text generation: {e}")
         return jsonify({'error': 'An error occurred while processing your request.'}), 500
+
+app.config['UPLOAD_FOLDER'] = './uploads'  # Folder to store uploaded files
+app.config['CSV_FOLDER'] = './csv_files'  # Folder to store generated CSV files
+
+# Ensure the directories exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['CSV_FOLDER'], exist_ok=True)
+
+@app.route('/upload-wav', methods=['POST'])
+def upload_wav():
+    if 'files[]' not in request.files:
+        return jsonify({'error': 'No files part'}), 400
+
+    files = request.files.getlist('files[]')
+    if not files or len(files) == 0:
+        return jsonify({'error': 'No files selected'}), 400
+
+    output_files = []
+
+    for file in files:
+        if file.filename == '':
+            continue
+        if file and file.filename.endswith('.wav'):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            # Convert WAV to CSV
+            try:
+                converted_files = convert_wav_to_csv(filepath, app.config['CSV_FOLDER'])
+                output_files.extend(converted_files)
+            except Exception as e:
+                return jsonify({'error': str(e)}), 500
+
+    if len(output_files) == 1:
+        return send_file(output_files[0], as_attachment=True)
+    elif len(output_files) > 1:
+        return jsonify({'files': output_files}), 200
+
+    return jsonify({'error': 'No valid WAV files were processed'}), 400
+
 
 if __name__ == '__main__':
     update_secret_key_in_env()
