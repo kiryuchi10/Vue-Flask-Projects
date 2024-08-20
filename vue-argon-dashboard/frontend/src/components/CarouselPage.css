@@ -1,0 +1,9 @@
+/* Hide the default carousel navigation captions */
+.carousel-control-prev, 
+.carousel-control-next {
+  display: none; /* Hides the navigation buttons */
+}
+
+.carousel-indicators {
+  display: none; /* Hides the indicators (dots) */
+}

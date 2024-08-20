@@ -1,4 +1,3 @@
-// UserContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Create a Context for the user
@@ -11,17 +10,22 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('/login', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}` // Example token
-          },
-        });
+        const token = localStorage.getItem('authToken'); // Example token retrieval
+        if (token) {
+          const response = await fetch('/check-login', { // Adjust endpoint as needed
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`, // Example token
+            },
+          });
 
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+          } else {
+            setUser(null);
+          }
         } else {
           setUser(null);
         }
@@ -34,11 +38,24 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  // Function to log in a user
+  const login = (userData, token) => {
+    setUser(userData);
+    localStorage.setItem('authToken', token); // Store the token
+  };
+
+  // Function to log out a user
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('authToken'); // Remove the token
+  };
+
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{ user, login, logout }}>
       {children}
     </UserContext.Provider>
   );
 };
 
+// Custom hook to use the UserContext
 export const useUser = () => useContext(UserContext);

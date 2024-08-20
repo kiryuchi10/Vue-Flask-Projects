@@ -1,85 +1,78 @@
 /* AppBar.css */
 
-/* Main app bar styling */
 .app-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 32px; /* Adjusted height */
-    padding: 0 16px; /* Adjust padding as needed */
-    background-color: #333; /* Example background color */
-    color: #fff; /* Example text color */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Dimmer box shadow */
-    transition: box-shadow 0.2s ease; /* Shorter transition duration */
-  }
-  
-  /* Apply shadow when the app bar is clicked or focused */
-  .app-bar:focus-within,
-  .app-bar:active {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Slightly stronger but still dim shadow */
-  }
-  
-  /* Remove shadow effect from the clicked state */
-  .app-bar.clicked {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Dim shadow remains after click */
-  }
-  
-  /* Style for the drawer toggle button */
-  .drawer-toggle {
-    background: none;
-    border: none;
-    color: #fff; /* Match the color of the text */
-    font-size: 24px; /* Adjust font size as needed */
-  }
-  
-  /* Style for the logo */
-  .logo {
-    font-size: 16px; /* Adjust font size as needed */
-    font-weight: bold;
-  }
-  
-  /* Style for the notification icon */
-  .notification-icon {
-    background: none;
-    border: none;
-    color: #fff; /* Match the color of the text */
-    font-size: 24px; /* Adjust font size as needed */
-  }
-  
-  /* Side drawer styling */
-  .side-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 250px;
-    height: 100%;
-    background: #fff;
-    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.2);
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-  }
-  
-  .side-drawer.open {
-    transform: translateX(0);
-  }
-  
-  /* Drawer close button styling */
-  .drawer-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #333; /* Adjust color as needed */
-  }
-  
-  /* Navigation links styling */
-  .nav-links a {
-    display: block;
-    padding: 15px;
-    text-decoration: none;
-    color: #333; /* Adjust color as needed */
-  }
-  
-  .nav-links a:hover {
-    background-color: #f0f0f0; /* Example hover effect */
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #333;
+  color: white;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Ensure it stays above other content */
+}
+
+.drawer-toggle {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.user-info {
+  margin-left: 10px;
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.side-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100%;
+  background: #fff;
+  color: #333;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+.side-drawer.open {
+  transform: translateX(0);
+}
+
+.drawer-close {
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.nav-links a {
+  margin: 10px 0;
+  text-decoration: none;
+  color: #333;
+}

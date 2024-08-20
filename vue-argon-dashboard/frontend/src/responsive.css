@@ -1,0 +1,51 @@
+/* responsive.css */
+
+.container {
+    padding-top: 64px;
+    padding-bottom: 56px;
+    margin: 0 auto;
+    max-width: 1200px;
+  }
+  
+  .form-container {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .main-page-extras {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .container {
+      padding-top: 56px;
+      padding-bottom: 50px;
+      max-width: 100%;
+      padding: 0 10px;
+    }
+  
+    .main-page-extras {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    .form-container {
+      padding: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .container {
+      padding-top: 50px;
+      padding-bottom: 50px;
+    }
+  
+    .form-container {
+      padding: 10px;
+    }
+  }
+  

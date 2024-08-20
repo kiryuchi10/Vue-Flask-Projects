@@ -1,19 +1,25 @@
-.calendar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    background-color: #f9f9f9;
-    min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
+/* CalendarPage.css */
+
+/* Base styles for the calendar */
+.react-calendar {
+    border: 1px solid #ddd; /* Optional: add border */
+    border-radius: 8px; /* Optional: add rounded corners */
+    background-color: #fff; /* Background color for the calendar */
   }
   
-  .calendar-container h2 {
-    margin-bottom: 20px;
+  /* Customize weekdays and weekends */
+  .react-calendar__month-view__days__day {
+    color: #000; /* Default text color for weekdays */
   }
   
-  .react-calendar {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* Weekend days (Saturday and Sunday) */
+  .react-calendar__month-view__days__day--weekend {
+    color: #888; /* Color for weekend days */
+  }
+  
+  /* Optional: add hover effect for days */
+  .react-calendar__month-view__days__day:hover {
+    background-color: #e0e0e0; /* Light background color on hover */
+    cursor: pointer; /* Pointer cursor on hover */
   }
   

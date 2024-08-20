@@ -34,6 +34,24 @@ const ProfilePage = () => {
     fetchUser();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      // Perform logout logic
+      localStorage.removeItem('authToken'); // Remove the token
+
+      // Optionally, you might want to make an API call to invalidate the session on the server
+      // await fetch('/logout', { method: 'POST' });
+
+      // Clear user from state
+      setUser(null);
+
+      // Redirect to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   const handleLoginRedirect = () => {
     navigate('/login');
   };
@@ -57,6 +75,9 @@ const ProfilePage = () => {
       <h2>Profile Page</h2>
       <div className="user-info">
         <p><strong>Name:</strong> {user.user_name}</p>
+        <button onClick={handleLogout} className="logout-button">
+          Logout
+        </button>
       </div>
     </div>
   );

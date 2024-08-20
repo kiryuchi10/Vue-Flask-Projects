@@ -1,93 +1,90 @@
-/* General container styles */
+/* global.css */
+
+/* Reset some default browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensures padding and border are included in the element's width and height */
+  font-family: Arial, sans-serif; /* Basic font family for consistency */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+body {
+  background-color: #f4f4f4; /* Light background color for the whole page */
+  color: #333; /* Default text color */
+}
+
 .container {
+  max-width: 1200px; /* Set a max-width for larger screens */
+  margin: 0 auto; /* Center the container */
+  padding: 20px; /* Add padding around the container */
+  width: 100%; /* Ensure the container takes up full width within its max-width */
+}
+
+.header, .footer {
+  background-color: #fff; /* Background color for header and footer */
+  padding: 10px 20px; /* Padding for header and footer */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add a subtle shadow */
+}
+
+.main-content {
+  background-color: #fff; /* Background color for main content area */
+  padding: 20px; /* Padding around the main content */
+  border-radius: 8px; /* Rounded corners for main content area */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Add a subtle shadow */
+}
+
+button {
+  background-color: #007bff; /* Button background color */
+  color: #fff; /* Button text color */
+  border: none;
+  border-radius: 4px; /* Rounded corners for buttons */
+  padding: 10px 20px; /* Padding inside the button */
+  cursor: pointer; /* Change cursor to pointer on hover */
+  transition: background-color 0.3s; /* Smooth transition for background color on hover */
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker background color on hover */
+}
+
+a {
+  color: #007bff; /* Link color */
+  text-decoration: none; /* Remove underline from links */
+}
+
+a:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+input, select, textarea {
+  border: 1px solid #ccc; /* Border color for inputs, selects, and textareas */
+  border-radius: 4px; /* Rounded corners for form elements */
+  padding: 8px; /* Padding inside form elements */
+  width: 100%; /* Full width for form elements */
+  margin-bottom: 10px; /* Space below form elements */
+}
+
+.nav-links {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 10px; /* Adjust padding to use space effectively */
-  box-sizing: border-box; /* Ensure padding is included in width/height */
 }
 
-/* AppBar styles */
-.app-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px; /* Adjust padding to reduce space */
-  height: 40px; /* Adjust height to make it tighter */
-  background-color: #333; /* Example background color */
+.nav-links a {
+  margin: 5px 0; /* Space between navigation links */
 }
 
-.app-bar .logo {
-  font-size: 18px; /* Adjust font size to fit space */
-  color: #fff;
-}
-
-.app-bar .drawer-toggle,
-.app-bar .notification-icon {
-  font-size: 20px; /* Adjust icon size */
-}
-
-/* Bottom Navigation styles */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  background-color: #333;
-  height: 50px; /* Adjust height to fit items */
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-}
-
-.bottom-nav .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 12px; /* Reduce font size */
-  padding: 5px; /* Reduce padding */
-}
-
-.bottom-nav .nav-item .icon {
-  font-size: 20px; /* Adjust icon size */
-}
-
-.bottom-nav .nav-item .label {
-  font-size: 10px; /* Smaller text size */
-}
-
-/* MainPage styles */
-.main-page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Align items at the top */
-  width: 100%;
-  min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
-}
-
-.main-page-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px; /* Reduced padding */
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Dimmer shadow */
-  max-width: 100%;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Media queries for smaller screens */
-@media (max-width: 600px) {
-  .bottom-nav .nav-item .icon {
-    font-size: 18px; /* Smaller icon size on small screens */
+@media (min-width: 768px) {
+  .nav-links {
+    flex-direction: row; /* Horizontal layout for larger screens */
   }
 
-  .bottom-nav .nav-item .label {
-    font-size: 8px; /* Smaller text size on small screens */
+  .nav-links a {
+    margin: 0 10px; /* Horizontal spacing for navigation links */
   }
 }

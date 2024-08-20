@@ -1,13 +1,20 @@
 from flask import Flask, request, jsonify, abort
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 import hashlib
 import logging
-import os
-import secrets
-from flask_mail import Mail, Message
 import datetime
+import jwt
+import requests
+from flask_mail import Mail, Message
+from dotenv import load_dotenv
 import secrets
+import os
+from transformers import pipeline
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -15,43 +22,43 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('flask_app')
 
-@app.before_request
-def log_request_info():
-    logger.info(f"Received {request.method} request for {request.url}")
-    logger.info(f"Request Headers: {request.headers}")
-    logger.info(f"Request Body: {request.get_data(as_text=True)}")
-
-@app.after_request
-def log_response_info(response):
-    logger.info(f"Response Status: {response.status}")
-    logger.info(f"Response Headers: {response.headers}")
-    logger.info(f"Response Body: {response.get_data(as_text=True)}")
-    return response
-
 # MySQL configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@localhost/aichatbotproject'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Configure Flask-Mail
-app.config['MAIL_SERVER'] = 'smtp.example.com'  # Replace with your mail server
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
-app.config['MAIL_USERNAME'] = 'your-email@example.com'
-app.config['MAIL_PASSWORD'] = 'your-email-password'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')  # Ensure default sender is set
 mail = Mail(app)
+
+# Set the secret key for JWT
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+# Set up CORS
+CORS(app)
+
+# Initialize the chat model using transformers
+from transformers import pipeline
+
+chat_model = pipeline("text-generation", model="EleutherAI/gpt-neo-2.7B", framework="pt")
 
 # Define User model
 class User(db.Model):
     __tablename__ = 'users'
-    user_no = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Auto-incrementing primary key
+    user_no = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_name = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     branch_id = db.Column(db.String(100))
     auth_code = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True, nullable=False)
 
+# Define PasswordResetToken model
 class PasswordResetToken(db.Model):
     __tablename__ = 'password_reset_tokens'
     token = db.Column(db.String(255), primary_key=True)
@@ -67,17 +74,54 @@ class ToDo(db.Model):
 
     def __repr__(self):
         return f"<ToDo {self.text}>"
-    
 
+def update_secret_key_in_env():
+    # Generate a new secret key
+    secret_key = secrets.token_hex(32)  # Generates a 64-character hexadecimal string
+
+    # Path to the .env file
+    env_file_path = '.env'
+
+    # Check if the .env file exists
+    if os.path.exists(env_file_path):
+        # Read the existing contents
+        with open(env_file_path, 'r') as file:
+            lines = file.readlines()
+
+        # Check if SECRET_KEY is already in the file
+        secret_key_updated = False
+        with open(env_file_path, 'w') as file:
+            for line in lines:
+                if line.startswith('SECRET_KEY='):
+                    file.write(f'SECRET_KEY={secret_key}\n')
+                    secret_key_updated = True
+                else:
+                    file.write(line)
+            # If SECRET_KEY was not in the file, add it
+            if not secret_key_updated:
+                file.write(f'SECRET_KEY={secret_key}\n')
+    else:
+        # Create the .env file and write the SECRET_KEY
+        with open(env_file_path, 'w') as file:
+            file.write(f'SECRET_KEY={secret_key}\n')
+
+    print(f'SECRET_KEY has been updated in {env_file_path}.')
+    return secret_key
 
 # Function to generate a token
-def generate_token():
-    return secrets.token_urlsafe(16)  # Generates a 16-byte random token
+def generate_token(user_id):
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)  # Token valid for 1 day
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return token
 
 # Hash function for passwords
 def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    return generate_password_hash(password)
 
+# Routes for user signup
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
@@ -86,11 +130,9 @@ def signup():
     branch_id = data.get('branchId')
     email = data.get('email')
 
-    # Validate required fields
     if not all([user_name, password, branch_id, email]):
         return jsonify({'message': 'Missing required fields'}), 400
 
-    # Check if user_name or email already exists
     existing_user = User.query.filter(
         (User.user_name == user_name) | (User.email == email)
     ).first()
@@ -98,35 +140,34 @@ def signup():
     if existing_user:
         return jsonify({'message': 'User with this username or email already exists'}), 409
 
-    # Generate a unique auth_code
-    auth_code = generate_token()
-
-    new_user = User(user_name=user_name, password=password, branch_id=branch_id, auth_code=auth_code, email=email)
+    new_user = User(user_name=user_name, password=password, branch_id=branch_id, email=email)
     db.session.add(new_user)
     try:
         db.session.commit()
-        return jsonify({'message': 'User created successfully', 'auth_code': auth_code}), 201
+        return jsonify({'message': 'User created successfully'}), 201
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error occurred during signup: {e}")
-        return jsonify({'message': 'Error occurred: ' + str(e)}), 500
+        return jsonify({'message': f'Error occurred: {str(e)}'}), 500
 
+# Routes for user login
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     user_name = data.get('userName')
-    password = hash_password(data.get('password', ''))
+    password = data.get('password', '')
 
-    user = User.query.filter_by(user_name=user_name, password=password).first()
+    user = User.query.filter_by(user_name=user_name).first()
 
-    if user:
-        token = generate_token()
+    if user and check_password_hash(user.password, password):
+        token = generate_token(user.user_no)
         user.auth_code = token
         db.session.commit()
         return jsonify({'message': 'Login successful', 'token': token}), 200
     else:
         return jsonify({'message': 'Invalid credentials'}), 401
 
+# Route to handle password reset request
 @app.route('/findpassword', methods=['POST'])
 def find_password():
     data = request.json
@@ -148,79 +189,104 @@ def find_password():
     try:
         db.session.commit()
 
-        # Send email logic (omitted for brevity)
-        # ...
-
+        msg = Message('Password Reset Request',
+                      sender=app.config['MAIL_DEFAULT_SENDER'],  # Ensure the sender is configured
+                      recipients=[email])
+        msg.body = f"Dear {user.user_name},\n\n" \
+                   f"You requested a password reset. Please use the following link to reset your password:\n\n" \
+                   f"http://localhost:5000/reset-password/{token}\n\n" \
+                   f"If you did not request this, please ignore this email.\n\n" \
+                   f"Best regards,\nYour App Team"
+        mail.send(msg)
         return jsonify({'message': 'Password reset link sent'}), 200
     except Exception as e:
         db.session.rollback()
         logger.error(f"Error occurred during password reset request: {e}")
-        return jsonify({'message': 'Error occurred: ' + str(e)}), 500
+        return jsonify({'message': 'Password reset request received, but an error occurred while sending the email.'}), 500
 
-@app.route('/resetpassword', methods=['POST'])
-def reset_password():
-    data = request.json
-    token = data.get('token')
-    new_password = data.get('new_password')
-
-    if not token or not new_password:
-        return jsonify({'error': 'Token and new password are required'}), 400
-
-    token_data = PasswordResetToken.query.filter_by(token=token).first()
-
-    if not token_data:
-        return jsonify({'error': 'Invalid or expired token'}), 400
-
-    if datetime.datetime.utcnow() > token_data.expiry:
-        return jsonify({'error': 'Token expired'}), 400
-
-    user = User.query.filter_by(email=token_data.email).first()
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-
-    user.password = hash_password(new_password)
-    db.session.delete(token_data)
+# Route to reset the password
+@app.route('/reset-password/<token>', methods=['POST'])
+def reset_password_token(token):
     try:
-        db.session.commit()
-        return jsonify({'message': 'Password successfully reset'}), 200
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Error occurred during password reset: {e}")
-        return jsonify({'message': 'Error occurred: ' + str(e)}), 500
+        new_password = request.json.get('new_password')
 
+        if not new_password:
+            return jsonify({'message': 'New password is required'}), 400
+
+        # Decode the token using your SECRET_KEY
+        user_token = PasswordResetToken.query.filter_by(token=token).first()
+
+        if not user_token or user_token.expiry < datetime.datetime.utcnow():
+            return jsonify({'message': 'Invalid or expired token'}), 400
+
+        user = User.query.filter_by(email=user_token.email).first()
+
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        hashed_password = hash_password(new_password)
+        user.password = hashed_password
+        db.session.delete(user_token)  # Token used, delete it
+        db.session.commit()
+
+        return jsonify({'message': 'Password reset successful'}), 200
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token'}), 400
+
+# Route to retrieve user profile
 @app.route('/profile', methods=['GET'])
 def profile():
     token = request.headers.get('Authorization')
     if not token:
         abort(401, description='Authorization token is missing')
 
-    token = token.replace('Bearer ', '')  # Extract token if prefixed with 'Bearer '
-    user = User.query.filter_by(auth_code=token).first()
-    
-    if not user:
+    token = token.replace('Bearer ', '')
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = data['user_id']
+        user = User.query.get(user_id)
+
+        if not user:
+            abort(401, description='Invalid token')
+
+        return jsonify({
+            'userNo': user.user_no,
+            'userName': user.user_name,
+            'branchId': user.branch_id,
+            'authCode': user.auth_code
+        })
+    except jwt.ExpiredSignatureError:
+        abort(401, description='Token has expired')
+    except jwt.InvalidTokenError:
         abort(401, description='Invalid token')
 
-    return jsonify({
-        'userNo': user.user_no,
-        'userName': user.user_name,
-        'branchId': user.branch_id,
-        'authCode': user.auth_code
-    })
-
+# Route to check login status
 @app.route('/check-login', methods=['GET'])
 def check_login():
     auth_token = request.headers.get('Authorization')
-    
+
     if not auth_token:
         return jsonify({'message': 'No auth token provided'}), 401
 
-    auth_token = auth_token.replace('Bearer ', '')  # Extract token if prefixed with 'Bearer '
-    user = User.query.filter_by(auth_code=auth_token).first()
+    auth_token = auth_token.replace('Bearer ', '')
+    try:
+        data = jwt.decode(auth_token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = data['user_id']
+        user = User.query.get(user_id)
 
-    if user:
-        return jsonify({'user_name': user.user_name}), 200
-    else:
+        if user:
+            return jsonify({'user_name': user.user_name}), 200
+        else:
+            return jsonify({'message': 'Invalid token'}), 401
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.InvalidTokenError:
         return jsonify({'message': 'Invalid token'}), 401
+
+# CRUD operations for To-Do list
 @app.route('/api/todos/<date>', methods=['GET'])
 def get_todos(date):
     try:
@@ -243,49 +309,45 @@ def add_todo(date):
         new_todo = ToDo(date=date, text=text)
         db.session.add(new_todo)
         db.session.commit()
-        return jsonify({'id': new_todo.id, 'text': new_todo.text}), 201
+        return jsonify({'message': 'ToDo added successfully'}), 201
     except ValueError:
         return jsonify({'error': 'Invalid date format'}), 400
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error occurred while adding ToDo: {e}")
+        return jsonify({'message': f'Error occurred: {str(e)}'}), 500
 
-@app.route('/api/todos/<date>/<int:todo_id>', methods=['DELETE'])
-def delete_todo(date, todo_id):
+@app.route('/api/todos/<int:id>', methods=['DELETE'])
+def delete_todo(id):
+    todo = ToDo.query.get(id)
+    if not todo:
+        return jsonify({'error': 'ToDo not found'}), 404
+
+    db.session.delete(todo)
     try:
-        date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        todo = ToDo.query.filter_by(id=todo_id, date=date).first()
-        if not todo:
-            return jsonify({'error': 'To-do not found'}), 404
-
-        db.session.delete(todo)
         db.session.commit()
-        return jsonify({'message': 'To-do deleted successfully'}), 200
-    except ValueError:
-        return jsonify({'error': 'Invalid date format'}), 400
+        return jsonify({'message': 'ToDo deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error occurred while deleting ToDo: {e}")
+        return jsonify({'message': f'Error occurred: {str(e)}'}), 500
 
-@app.route('/api/todos/<date>/<int:todo_id>', methods=['PUT'])
-def update_todo(date, todo_id):
-    data = request.json
+# Chatbot Route using transformers
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
     text = data.get('text')
+
     if not text:
         return jsonify({'error': 'Text is required'}), 400
 
     try:
-        date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
-        todo = ToDo.query.filter_by(id=todo_id, date=date).first()
-        if not todo:
-            return jsonify({'error': 'To-do not found'}), 404
-
-        todo.text = text
-        db.session.commit()
-        return jsonify({'id': todo.id, 'text': todo.text}), 200
-    except ValueError:
-        return jsonify({'error': 'Invalid date format'}), 400
-
-def get_user_from_token(token):
-    # Simulated function to convert token to user ID
-    # Replace with actual token verification logic
-    if token == 'valid-token':  # Example token check
-        return 'user1'  # Example user ID
-    return None
+        response = chat_model(text, max_length=150, num_return_sequences=1)
+        return jsonify({'response': response[0]['generated_text'].strip()})
+    except Exception as e:
+        print(f"Error during text generation: {e}")
+        return jsonify({'error': 'An error occurred while processing your request.'}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    update_secret_key_in_env()
+    app.run(debug=True)

@@ -1,8 +1,9 @@
 // pages/Calendar.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Calendar from 'react-calendar'; // Make sure to install this package or use your own calendar component
-import 'react-calendar/dist/Calendar.css'; // If using the react-calendar package
+import Calendar from 'react-calendar'; // Make sure this package is installed
+import 'react-calendar/dist/Calendar.css'; // Import default styles from react-calendar
+import './CalendarDatePage.css'; // Import custom styles
 
 const CalendarPage = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const CalendarPage = () => {
       <h1>Calendar</h1>
       <Calendar
         onClickDay={handleDateClick}
-        // You can customize the calendar here
+        // Customizations can be added here if needed
       />
     </div>
   );

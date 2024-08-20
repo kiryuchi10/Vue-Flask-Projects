@@ -1,32 +1,23 @@
 /* ProfilePage.css */
+
 .profile-page {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .user-info {
-    margin-top: 20px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f9f9f9;
-  }
-  
-  button {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 20px 2px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
+  margin: 80px 20px 20px 20px; /* Margin to account for fixed AppBar */
+}
+
+.user-info {
+  margin-bottom: 20px;
+}
+
+.logout-button {
+  background-color: #f44336; /* Red color for logout button */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.logout-button:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}

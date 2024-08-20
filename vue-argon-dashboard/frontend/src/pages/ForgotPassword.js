@@ -10,8 +10,8 @@ const ForgotPassword = () => {
     setMessage(''); // Clear previous messages
 
     try {
-      // Assuming you have an API endpoint for password reset
-      const response = await fetch('/reset-password', {
+      // Corrected the API endpoint URL
+      const response = await fetch('http://localhost:5000/findpassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

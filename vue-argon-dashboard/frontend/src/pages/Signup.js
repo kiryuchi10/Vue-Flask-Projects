@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {useNavigate} from "react-router-dom";
 import axios from 'axios';
 
 const Signup = () => {
@@ -6,6 +7,8 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [branchId, setBranchId] = useState('');
     const [email, setEmail] = useState('');  // New state for email
+    const navigate =useNavigate();
+
 
     const handleSignup = () => {
         axios.post('/signup', {
@@ -16,6 +19,7 @@ const Signup = () => {
         })
         .then(response => {
             alert(response.data.message);
+            navigate("/mainpage");
         })
         .catch(error => {
             console.error('There was an error signing up!', error);

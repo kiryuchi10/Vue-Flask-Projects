@@ -1,40 +1,97 @@
-/* MainPage.css */
-
-/* Container that takes full viewport height minus header/footer */
 .main-page-container {
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Center horizontally */
-  justify-content: flex-start; /* Align to the top */
-  width: 100%;
-  min-height: calc(100vh - 56px); /* Adjust based on header/footer height */
-  padding-top: 20px; /* Optional: Add padding if needed */
-  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
 }
 
-/* Content styling */
-.main-page-content {
+.chat-container {
+  width: 400px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.chat-box {
+  height: 300px;
+  padding: 10px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 100%;
+}
+
+.message {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: #007bff;
+  color: white;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background-color: #e2e2e2;
+  color: black;
+}
+
+.input-form {
+  display: flex;
+  padding: 10px;
+  background: #ddd;
+}
+
+.input-form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.input-form button {
+  margin-left: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.input-form button:hover {
+  background-color: #0056b3;
+}
+
+.buffering-bar {
   width: 100%;
-  box-sizing: border-box;
+  height: 4px;
+  background-color: #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
 }
 
-/* Additional styling for data display section */
-.data-display {
-  margin-top: 20px;
+.buffering-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #007bff;
+  animation: buffering 1.5s infinite linear;
 }
 
-/* Responsive styling for smaller screens */
-@media (max-width: 600px) {
-  .main-page-content {
-    padding: 15px;
-    width: 100%;
+@keyframes buffering {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
   }
 }

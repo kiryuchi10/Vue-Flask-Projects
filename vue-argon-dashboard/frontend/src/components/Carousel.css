@@ -2,8 +2,8 @@
 
 .carousel-container {
     width: 100%;
-    max-width: 1200px; /* Adjust max-width as needed */
-    margin: 0 auto;
+    max-width: 1000px; /* Adjust max-width as needed */
+    margin: 100px auto;
     position: relative;
   }
   
@@ -14,7 +14,7 @@
   }
   
   .carousel-image {
-    width: 100%; /* Makes the image fit the container */
+    width: auto; /* Makes the image fit the container */
     height: auto;
     border-radius: 8px; /* Rounded corners for images */
   }

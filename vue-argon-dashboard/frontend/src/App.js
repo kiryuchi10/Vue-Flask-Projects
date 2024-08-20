@@ -18,7 +18,7 @@ import SplashScreen from './components/SplashScreen';
 import RecentPages from './components/RecentPages';
 import Grid from './components/Grid';
 import { UserProvider } from './contexts/UserContext';
-import './Global.css';
+import './global.css'; 
 
 const App = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -47,8 +47,8 @@ const App = () => {
             <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
             <div style={{ paddingTop: '64px', paddingBottom: '56px' }} className="container">
               <Routes>
-                <Route path="/profilepage" element={<ProfilePage />} />
                 <Route path="/" element={<MainPageWithExtras />} />
+                <Route path="/profilepage" element={<ProfilePage />} />
                 <Route path="/mainpage" element={<MainPage />} />
                 <Route path="/mainpagewithextras" element={<MainPageWithExtras />} />
                 <Route path="/about" element={<About />} />

@@ -5,7 +5,9 @@ import './AppBar.css';
 
 const AppBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const user = useUser(); // Get the current user from context
+
+  // Handle case where useUser might return null
+  const { user } = useUser() || {}; // Safe destructuring
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -13,20 +15,15 @@ const AppBar = () => {
 
   return (
     <header className="app-bar">
-      <button className="drawer-toggle" onClick={toggleDrawer}>
+      <button className="drawer-toggle" onClick={toggleDrawer} aria-label="Toggle menu">
         ☰
       </button>
       <div className="logo">GoYeBang</div>
-      {user && (
-        <div className="user-info">
-          <span>Welcome, {user.name}</span>
-        </div>
-      )}
-      <button className="notification-icon">
+      <button className="notification-icon" aria-label="Notifications">
         🔔
       </button>
       <div className={`side-drawer ${drawerOpen ? 'open' : ''}`}>
-        <button className="drawer-close" onClick={toggleDrawer}>
+        <button className="drawer-close" onClick={toggleDrawer} aria-label="Close menu">
           &times;
         </button>
         <nav className="nav-links">
