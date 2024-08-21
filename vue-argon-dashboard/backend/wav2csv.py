@@ -1,5 +1,4 @@
 # wav2csv.py
-
 import os
 from scipy.io import wavfile
 import pandas as pd

@@ -1,4 +1,8 @@
 from flask import Flask, request, jsonify, abort
+
+from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
+import logging
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -49,8 +53,6 @@ CORS(app)
 
 # Initialize the chat model using transformers
 from transformers import pipeline
-
-chat_model = pipeline("text-generation", model="EleutherAI/gpt-neo-2.7B", framework="pt")
 
 # Define User model
 class User(db.Model):
@@ -336,7 +338,27 @@ def delete_todo(id):
         logger.error(f"Error occurred while deleting ToDo: {e}")
         return jsonify({'message': f'Error occurred: {str(e)}'}), 500
 
-# Chatbot Route using transformers
+import torch
+
+def check_tensor(tensor):
+    if torch.any(torch.isnan(tensor)) or torch.any(torch.isinf(tensor)):
+        return False
+    return True
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('flask_app')
+
+# Initialize the model and tokenizer
+tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+
+# Set the eos_token as the pad_token to avoid padding issues
+tokenizer.pad_token = tokenizer.eos_token
+
+# Initialize the text generation pipeline
+chat_model = pipeline("text-generation", model=model, tokenizer=tokenizer, framework="pt")
+
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json()
@@ -346,11 +368,17 @@ def chat():
         return jsonify({'error': 'Text is required'}), 400
 
     try:
-        response = chat_model(text, max_length=150, num_return_sequences=1)
+        # Tokenize the input with truncation and padding
+        encoded_input = tokenizer.encode(text, return_tensors='pt', truncation=True, max_length=50, padding='max_length')
+
+        # Generate the text response
+        response = chat_model(tokenizer.decode(encoded_input[0]), max_new_tokens=20, pad_token_id=tokenizer.eos_token_id)
+
         return jsonify({'response': response[0]['generated_text'].strip()})
     except Exception as e:
-        print(f"Error during text generation: {e}")
+        logger.error(f"Error during text generation: {e}")
         return jsonify({'error': 'An error occurred while processing your request.'}), 500
+
 
 app.config['UPLOAD_FOLDER'] = './uploads'  # Folder to store uploaded files
 app.config['CSV_FOLDER'] = './csv_files'  # Folder to store generated CSV files

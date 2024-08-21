@@ -2,7 +2,7 @@
 
 /* Base styles for the calendar */
 .react-calendar {
-    border: 1px solid #ddd; /* Optional: add border */
+    border: 1px solid #080606; /* Optional: add border */
     border-radius: 8px; /* Optional: add rounded corners */
     background-color: #fff; /* Background color for the calendar */
   }
@@ -14,12 +14,12 @@
   
   /* Weekend days (Saturday and Sunday) */
   .react-calendar__month-view__days__day--weekend {
-    color: #888; /* Color for weekend days */
+    color: #ef1c1c; /* Color for weekend days */
   }
   
   /* Optional: add hover effect for days */
   .react-calendar__month-view__days__day:hover {
-    background-color: #e0e0e0; /* Light background color on hover */
+    background-color: #040303; /* Light background color on hover */
     cursor: pointer; /* Pointer cursor on hover */
   }
   

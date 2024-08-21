@@ -81,10 +81,18 @@ const SpeechToText = ({ onTextSubmit }) => {
         <div style={{ width: `${progress}%`, height: '100%', backgroundColor: '#007bff', borderRadius: '5px' }} />
       </div>
       <div style={{ marginTop: '20px' }}>
-        <button onClick={startRecording} style={{ marginRight: '10px' }}>Start</button>
-        <button onClick={stopRecording} style={{ marginRight: '10px' }}>Stop</button>
-        <button onClick={resetTranscript} style={{ marginRight: '10px' }}>Reset</button>
-        <button onClick={() => onTextSubmit(transcript)}>Submit to ChatGPT</button>
+        <button onClick={startRecording} style={{ marginRight: '10px' }} disabled={recording}>
+          Start
+        </button>
+        <button onClick={stopRecording} style={{ marginRight: '10px' }} disabled={!recording}>
+          Stop
+        </button>
+        <button onClick={resetTranscript} style={{ marginRight: '10px' }}>
+          Reset
+        </button>
+        <button onClick={() => onTextSubmit(transcript)} disabled={!transcript}>
+          Submit to ChatGPT
+        </button>
       </div>
       <div style={{ marginTop: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px', minHeight: '100px' }}>
         <p><strong>Real-Time Converted Text:</strong></p>
