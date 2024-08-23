@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify, abort
-
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 import logging
-
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -349,15 +348,9 @@ def check_tensor(tensor):
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('flask_app')
 
-# Initialize the model and tokenizer
-tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
-model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
-
-# Set the eos_token as the pad_token to avoid padding issues
-tokenizer.pad_token = tokenizer.eos_token
-
-# Initialize the text generation pipeline
-chat_model = pipeline("text-generation", model=model, tokenizer=tokenizer, framework="pt")
+# Load the DialoGPT model and tokenizer
+tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-small")
+model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-small")
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -368,59 +361,69 @@ def chat():
         return jsonify({'error': 'Text is required'}), 400
 
     try:
-        # Tokenize the input with truncation and padding
-        encoded_input = tokenizer.encode(text, return_tensors='pt', truncation=True, max_length=50, padding='max_length')
+        # Encode the input and generate a response
+        input_ids = tokenizer.encode(text + tokenizer.eos_token, return_tensors='pt')
+        response_ids = model.generate(input_ids, max_length=100, pad_token_id=tokenizer.eos_token_id)
 
-        # Generate the text response
-        response = chat_model(tokenizer.decode(encoded_input[0]), max_new_tokens=20, pad_token_id=tokenizer.eos_token_id)
+        # Decode and return the response
+        response_text = tokenizer.decode(response_ids[:, input_ids.shape[-1]:][0], skip_special_tokens=True)
 
-        return jsonify({'response': response[0]['generated_text'].strip()})
+        return jsonify({'response': response_text.strip()})
     except Exception as e:
-        logger.error(f"Error during text generation: {e}")
-        return jsonify({'error': 'An error occurred while processing your request.'}), 500
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+
 
 
 app.config['UPLOAD_FOLDER'] = './uploads'  # Folder to store uploaded files
 app.config['CSV_FOLDER'] = './csv_files'  # Folder to store generated CSV files
 
-# Ensure the directories exist
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['CSV_FOLDER'], exist_ok=True)
 
-@app.route('/upload-wav', methods=['POST'])
+
+import tempfile
+from Wav2Csv import Wav2Csv  # Ensure this import is correct based on your module structure
+
+
+app.config['UPLOAD_FOLDER'] = './uploads'  # Directory to store uploaded files
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+@app.route('/api/upload-wav', methods=['POST'])
 def upload_wav():
-    if 'files[]' not in request.files:
-        return jsonify({'error': 'No files part'}), 400
+    try:
+        if 'files[]' not in request.files:
+            return jsonify({'error': 'No files part'}), 400
 
-    files = request.files.getlist('files[]')
-    if not files or len(files) == 0:
-        return jsonify({'error': 'No files selected'}), 400
+        files = request.files.getlist('files[]')
+        if not files or len(files) == 0:
+            return jsonify({'error': 'No files selected'}), 400
 
-    output_files = []
+        uploaded_files = []
+        for file in files:
+            if file.filename == '':
+                continue
+            if file and file.filename.endswith('.wav'):
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(filepath)
+                uploaded_files.append(filepath)
 
-    for file in files:
-        if file.filename == '':
-            continue
-        if file and file.filename.endswith('.wav'):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
+        if len(uploaded_files) > 0:
+            converter = Wav2Csv(uploaded_files)
+            
+            # Save to a temporary CSV file
+            output_file = tempfile.NamedTemporaryFile(delete=False, suffix='.csv')
+            converter.save_to_csv(output_file.name)
 
-            # Convert WAV to CSV
-            try:
-                converted_files = convert_wav_to_csv(filepath, app.config['CSV_FOLDER'])
-                output_files.extend(converted_files)
-            except Exception as e:
-                return jsonify({'error': str(e)}), 500
+            # Return the CSV file for download
+            return send_file(output_file.name, as_attachment=True, download_name="features.csv")
+        else:
+            return jsonify({'error': 'No valid WAV files were processed'}), 400
 
-    if len(output_files) == 1:
-        return send_file(output_files[0], as_attachment=True)
-    elif len(output_files) > 1:
-        return jsonify({'files': output_files}), 200
-
-    return jsonify({'error': 'No valid WAV files were processed'}), 400
-
-
+    except Exception as e:
+        return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
+    
+    
 if __name__ == '__main__':
     update_secret_key_in_env()
     app.run(debug=True)
