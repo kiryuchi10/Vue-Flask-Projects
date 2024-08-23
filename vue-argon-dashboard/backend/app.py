@@ -372,7 +372,134 @@ def chat():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
+@app.route('/recording',  methods=['GET', 'POST'])
+def recording():
+    fs = 44100  # Sample rate
+    seconds = 4  # Duration of recording
+    if request.method == "POST":
+        print("-----------------------START RECORDING-------------------------")
+        myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=2)
+        sd.wait()  
+        print("-----------------------STOP RECORDING-------------------------")
+        write('static/output.wav', fs, myrecording)  
+    return render_template('recording.html')
 
+@app.route('/predicting', methods=['GET', 'POST'])
+def predicting():
+    if not sys.warnoptions:
+        warnings.simplefilter("ignore")
+    warnings.filterwarnings("ignore", category=DeprecationWarning) 
+    data, sample_rate = librosa.load('static/output.wav')
+    def Decoding(list):
+        if list[0] == 0:
+            return "Angry"
+        elif list[0] == 1:
+            return "Fear"
+        elif list[0] == 2:
+            return "Surprise"
+        elif list[0] == 3:
+            return "Disgust"
+        elif list[0] == 4:
+            return "Calm"
+        elif list[0] == 5:
+            return "Happy"
+        elif list[0] == 6:
+            return "Sad"
+        else:
+            return "Neutral"
+    def noise(data):
+        noise_amp = 0.035*np.random.uniform()*np.amax(data)
+        data = data + noise_amp*np.random.normal(size=data.shape[0])
+        return data
+
+    def stretch(data, rate=0.8):
+        return librosa.effects.time_stretch(data, rate)
+
+    def shift(data):
+        shift_range = int(np.random.uniform(low=-5, high = 5)*1000)
+        return np.roll(data, shift_range)
+
+    def pitch(data, sampling_rate, pitch_factor=0.7):
+        return librosa.effects.pitch_shift(data, sampling_rate, pitch_factor)
+
+    def extract_features(data):
+        # ZCR
+        result = np.array([])
+        zcr = np.mean(librosa.feature.zero_crossing_rate(y=data).T, axis=0)
+        result=np.hstack((result, zcr)) # stacking horizontally
+
+        # Chroma_stft
+        stft = np.abs(librosa.stft(data))
+        chroma_stft = np.mean(librosa.feature.chroma_stft(S=stft, sr=sample_rate).T, axis=0)
+        result = np.hstack((result, chroma_stft)) # stacking horizontally
+
+        # MFCC
+        mfcc = np.mean(librosa.feature.mfcc(y=data, sr=sample_rate).T, axis=0)
+        result = np.hstack((result, mfcc)) # stacking horizontally
+
+        # Root Mean Square Value
+        rms = np.mean(librosa.feature.rms(y=data).T, axis=0)
+        result = np.hstack((result, rms)) # stacking horizontally
+
+        # MelSpectogram
+        mel = np.mean(librosa.feature.melspectrogram(y=data, sr=sample_rate).T, axis=0)
+        result = np.hstack((result, mel)) # stacking horizontally
+        
+        return result
+
+    # Load pre-trained models
+CNN = tf.keras.models.load_model('Model/content/CNN')
+LR = joblib.load("Model/LogisticRegresion.pkl")
+SVM = joblib.load("Model/SVM.pkl")
+Knn = joblib.load("Model/Knn.pkl")
+
+def extract_features(data):
+    # Add your feature extraction logic here
+    pass
+
+def get_features(path):
+    # Load the audio file and extract features
+    data, sample_rate = librosa.load(path, duration=4, offset=0.6)
+    res1 = extract_features(data)
+    result = np.array(res1)
+    return result
+
+def Decoding(pred):
+    # Add your decoding logic here
+    pass
+
+@app.route('/api/predict', methods=['POST'])
+def predict():
+    # Assume the file is saved as 'static/output.wav'
+    test_case = 'static/output.wav'
+    featuring = get_features(test_case)
+    X3 = [featuring]
+    X4 = np.expand_dims(X3, axis=2)
+
+    # Make predictions
+    pred_test_1 = LR.predict(X3)
+    pred_test_2 = SVM.predict(X3)
+    pred_test_3 = Knn.predict(X3)
+    pred_test_4 = CNN.predict(X4)
+    pred_test_4 = pred_test_4.flatten()
+
+    # Determine the CNN prediction index
+    nl = []
+    for pred in pred_test_4:
+        nl.append(pred)
+    index_max = max(nl)
+    i = nl.index(index_max)
+
+    # Decode predictions
+    predictions = {
+        "LogisticRegression": Decoding(pred_test_1),
+        "SVM": Decoding(pred_test_2),
+        "Knn": Decoding(pred_test_3),
+        'CNN': Decoding(np.ndarray(i))
+    }
+
+    # Return predictions as JSON
+    return jsonify(predictions)
 
 app.config['UPLOAD_FOLDER'] = './uploads'  # Folder to store uploaded files
 app.config['CSV_FOLDER'] = './csv_files'  # Folder to store generated CSV files
