@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./MainPage.css"; // Import the CSS file
 import SpeechToText from "../components/SpeechToText"; // Import the SpeechToText component
 
@@ -9,6 +9,7 @@ const MainPage = () => {
   const [files, setFiles] = useState([]); // Store uploaded files
   const [filePath, setFilePath] = useState(""); // Store the path of the recorded file
   const [predictions, setPredictions] = useState(null); // Store predictions
+  const [graphUrl, setGraphUrl] = useState(null); // Store URL for the bar chart image
 
   const handleTextSubmit = async (text) => {
     if (text.trim() === "") return;
@@ -92,6 +93,9 @@ const MainPage = () => {
 
       // Add the bot's response to the conversation
       setMessages((prevMessages) => [...prevMessages, botMessage]);
+
+      // Fetch the graph after predicting emotions
+      fetchGraph();
     } catch (error) {
       console.error("Fetch error:", error);
       const botMessage = {
@@ -101,6 +105,21 @@ const MainPage = () => {
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGraph = async () => {
+    try {
+      const res = await fetch("/api/generate-graph");
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        setGraphUrl(url);
+      } else {
+        console.error("Failed to fetch graph");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
   };
 
@@ -147,6 +166,14 @@ const MainPage = () => {
           </div>
         )}
       </div>
+
+      {/* Image element to display the bar chart */}
+      {graphUrl && (
+        <div className="chart-container">
+          <h3>Emotion Predictions Bar Chart</h3>
+          <img src={graphUrl} alt="Emotion Predictions Bar Chart" />
+        </div>
+      )}
     </div>
   );
 };

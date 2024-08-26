@@ -45,8 +45,8 @@ def make_predictions(file):
         "7": "surprised",
     }
 
-    # Ensure we only use available predictions
-    prediction_dict = {emotions_dict[str(i)]: predictions[0][i] for i in range(predictions.shape[1])}
+    # Ensure all values are converted to regular Python floats
+    prediction_dict = {emotions_dict[str(i)]: float(predictions[0][i]) for i in range(predictions.shape[1])}
 
     return prediction_dict
 
@@ -62,10 +62,12 @@ def predict_all_files_in_folder(folder_path):
     
     # Convert results into a DataFrame
     df = pd.DataFrame(results)
+    os.makedirs("results", exist_ok=True)
+    df.to_csv("results/emotion_prediction.csv", index=False)
     return df
 
 # Example usage
-current_path=os.getcwd()
-folder_path = 'recordings'
+current_path = os.getcwd()
+folder_path = r'C:\Users\user\Downloads\my-ai-app\vue-argon-dashboard\backend\recordings'
 df_results = predict_all_files_in_folder(folder_path)
 print(df_results)

@@ -19,6 +19,8 @@ from scipy.io.wavfile import write
 import sounddevice as sd
 from datetime import datetime
 import glob as glob
+import matplotlib.pyplot as plt
+from io import BytesIO
 
 
 import Wav2Csv
@@ -101,6 +103,43 @@ def hash_password(password):
 # Initialize the chat model using transformers
 tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-small")
 model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-small")
+
+# Function to generate the bar graph and save it as an image
+def generate_bar_graph():
+    # Load the predictions from the CSV file
+    df = pd.read_csv("results/emotion_prediciton.csv")
+    
+    # Sum up the probabilities for each emotion across all files
+    emotion_totals = df.drop(columns=["filename"]).sum(axis=0)
+    
+    # Create a bar chart
+    plt.figure(figsize=(10, 6))
+    emotion_totals.plot(kind="bar", color="skyblue")
+    plt.title("Emotion Predictions")
+    plt.xlabel("Emotions")
+    plt.ylabel("Total Probability")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Ensure the images directory exists
+    image_dir = r"images"
+    os.makedirs(image_dir, exist_ok=True)
+
+    # Save the plot to the images directory
+    image_path = os.path.join(image_dir, "emotion_predictions.png")
+    plt.savefig(image_path, format="png")
+    plt.close()
+
+    return image_path
+
+@app.route('/api/generate-graph', methods=['GET'])
+def generate_graph():
+    # Generate the graph and save it
+    image_path = generate_bar_graph()
+    
+    # Return the image as a file
+    return send_file(image_path, mimetype='image/png')
+
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -206,7 +245,12 @@ def upload_wav():
     except Exception as e:
         return jsonify({'error': f'An internal server error occurred: {str(e)}'}), 500
 
-
+@app.route('/api/get-results', methods=['GET'])
+def get_results():
+    try:
+        return send_from_directory(directory='results', path='emotion_prediction.csv', as_attachment=False)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
