@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { ReactMic } from "react-mic";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
-import { saveAs } from "file-saver";
+import SpeechRecognition, { useSpeechRecognition } from "react-speech-recognition";
 
 const SpeechToText = ({ onTextSubmit }) => {
   const [recording, setRecording] = useState(false);
   const [progress, setProgress] = useState(0); // Progress for time bar
-  const { transcript, resetTranscript, browserSupportsSpeechRecognition } =
-    useSpeechRecognition();
+  const [predictedEmotion, setPredictedEmotion] = useState(null); // Store the predicted emotion
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition();
 
   useEffect(() => {
     let timer;
@@ -45,39 +42,47 @@ const SpeechToText = ({ onTextSubmit }) => {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
-  const startRecording = () => {
+  const startRecording = async () => {
     setRecording(true);
     resetTranscript(); // Clear previous transcript when starting a new recording
     SpeechRecognition.startListening({ continuous: true });
-  };
 
-  const stopRecording = () => {
-    setRecording(false);
-    SpeechRecognition.stopListening();
-  };
+    // Trigger the backend to start recording
+    try {
+      const res = await fetch("/start-recording", {
+        method: "POST",
+      });
 
-  const onStop = (recordedBlob) => {
-    // Validate the recorded audio before saving
-    if (validateAudioFile(recordedBlob)) {
-      saveAsWAV(recordedBlob); // Save the audio data as a WAV file
-    } else {
-      alert("The recorded file is not in a valid audio format.");
+      if (!res.ok) {
+        console.error("Error starting recording:", await res.text());
+        setRecording(false);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setRecording(false);
     }
   };
 
-  const validateAudioFile = (recordedBlob) => {
-    // Check if the audio file is in the correct format (WAV)
-    return recordedBlob.blob && recordedBlob.blob.type === "audio/wav";
-  };
+  const stopRecording = async () => {
+    setRecording(false);
+    SpeechRecognition.stopListening();
 
-  const saveAsWAV = (recordedBlob) => {
-    // Generate the current date and time in a readable format
-    const now = new Date();
-    const timestamp = now.toISOString().replace(/[-:.]/g, ""); // Format as YYYYMMDDTHHmmss
-    const filename = `voicegram_data_${timestamp}.wav`;
+    // Trigger the backend to stop recording and predict the emotion
+    try {
+      const res = await fetch("/api/predict-voice", {
+        method: "POST",
+      });
 
-    // Save the WAV file with the generated filename
-    saveAs(recordedBlob.blob, filename);
+      if (!res.ok) {
+        console.error("Error stopping recording:", await res.text());
+        return;
+      }
+
+      const data = await res.json();
+      setPredictedEmotion(data.emotion);
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
   };
 
   return (
@@ -85,7 +90,7 @@ const SpeechToText = ({ onTextSubmit }) => {
       <ReactMic
         record={recording}
         className="sound-wave"
-        onStop={onStop}
+        onStop={() => {}}
         strokeColor="#000000"
         backgroundColor="#FF4081"
         mimeType="audio/wav" // Explicitly setting the MIME type to ensure it's a WAV file
@@ -157,6 +162,14 @@ const SpeechToText = ({ onTextSubmit }) => {
           Submit
         </button>
       </div>
+
+      {/* Display predicted emotion */}
+      {predictedEmotion && (
+        <div style={{ marginTop: "20px" }}>
+          <h3>Predicted Emotion:</h3>
+          <p>{predictedEmotion}</p>
+        </div>
+      )}
     </div>
   );
 };

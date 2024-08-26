@@ -7,11 +7,12 @@ const MainPage = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState([]); // Store uploaded files
+  const [filePath, setFilePath] = useState(""); // Store the path of the recorded file
+  const [predictions, setPredictions] = useState(null); // Store predictions
 
   const handleTextSubmit = async (text) => {
     if (text.trim() === "") return;
 
-    // Add the user's message to the conversation
     const userMessage = { sender: "user", text: text };
     setMessages([...messages, userMessage]);
     setInput("");
@@ -59,21 +60,15 @@ const MainPage = () => {
     handleTextSubmit(input);
   };
 
-  const handleFileUpload = (e) => {
-    setFiles(e.target.files);
-  };
-
-  const handleFileSubmit = async () => {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files[]", files[i]);
-    }
-
+  const handlePredictEmotion = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/upload-wav", {
+      const res = await fetch("/predicting", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ file_path: filePath }),
       });
 
       if (!res.ok) {
@@ -81,16 +76,18 @@ const MainPage = () => {
         console.error("Error:", errorMessage);
         const botMessage = {
           sender: "bot",
-          text: "Error processing your files.",
+          text: "Error during prediction.",
         };
         setMessages((prevMessages) => [...prevMessages, botMessage]);
         return;
       }
 
       const data = await res.json();
+      setPredictions(data);
+
       const botMessage = {
         sender: "bot",
-        text: "Files processed successfully. Download the CSV from the provided link.",
+        text: "Prediction successful!",
       };
 
       // Add the bot's response to the conversation
@@ -99,7 +96,7 @@ const MainPage = () => {
       console.error("Fetch error:", error);
       const botMessage = {
         sender: "bot",
-        text: "An error occurred while processing your files.",
+        text: "An error occurred during prediction.",
       };
       setMessages((prevMessages) => [...prevMessages, botMessage]);
     } finally {
@@ -135,12 +132,20 @@ const MainPage = () => {
       {/* Integrate the SpeechToText component (Voicegram) */}
       <SpeechToText onTextSubmit={handleTextSubmit} />
 
-      {/* File upload section */}
-      <div className="file-upload-container">
-        <button onClick={handleFileSubmit} disabled={files.length === 0}>
-          Upload and Process Files
+      {/* Recording and Prediction Section */}
+      <div className="recording-container">
+        <button onClick={handlePredictEmotion} disabled={!filePath}>
+          Predict Emotion
         </button>
-        <input type="file" multiple accept=".wav" onChange={handleFileUpload} />
+        {predictions && (
+          <div className="predictions">
+            <h3>Predictions:</h3>
+            <p>Logistic Regression: {predictions.LogisticRegression}</p>
+            <p>SVM: {predictions.SVM}</p>
+            <p>KNN: {predictions.Knn}</p>
+            <p>CNN: {predictions.CNN}</p>
+          </div>
+        )}
       </div>
     </div>
   );
