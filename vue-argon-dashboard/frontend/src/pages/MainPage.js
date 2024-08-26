@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./MainPage.css"; // Import the CSS file
 import SpeechToText from "../components/SpeechToText"; // Import the SpeechToText component
 
@@ -6,8 +6,6 @@ const MainPage = () => {
   const [messages, setMessages] = useState([]); // Store the conversation messages
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [files, setFiles] = useState([]); // Store uploaded files
-  const [filePath, setFilePath] = useState(""); // Store the path of the recorded file
   const [predictions, setPredictions] = useState(null); // Store predictions
   const [graphUrl, setGraphUrl] = useState(null); // Store URL for the bar chart image
 
@@ -64,12 +62,8 @@ const MainPage = () => {
   const handlePredictEmotion = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/predicting", {
+      const res = await fetch("/api/predict-voice", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ file_path: filePath }),
       });
 
       if (!res.ok) {
@@ -94,7 +88,7 @@ const MainPage = () => {
       // Add the bot's response to the conversation
       setMessages((prevMessages) => [...prevMessages, botMessage]);
 
-      // Fetch the graph after predicting emotions
+      // Fetch the combined graph after predicting emotions
       fetchGraph();
     } catch (error) {
       console.error("Fetch error:", error);
@@ -148,26 +142,25 @@ const MainPage = () => {
         </form>
       </div>
 
-      {/* Integrate the SpeechToText component (Voicegram) */}
+      {/* Integrate the SpeechToText component */}
       <SpeechToText onTextSubmit={handleTextSubmit} />
 
       {/* Recording and Prediction Section */}
       <div className="recording-container">
-        <button onClick={handlePredictEmotion} disabled={!filePath}>
+        <button onClick={handlePredictEmotion}>
           Predict Emotion
         </button>
         {predictions && (
           <div className="predictions">
             <h3>Predictions:</h3>
-            <p>Logistic Regression: {predictions.LogisticRegression}</p>
-            <p>SVM: {predictions.SVM}</p>
-            <p>KNN: {predictions.Knn}</p>
-            <p>CNN: {predictions.CNN}</p>
+            {Object.entries(predictions).map(([emotion, value]) => (
+              <p key={emotion}>{`${emotion}: ${value.toFixed(2)}`}</p>
+            ))}
           </div>
         )}
       </div>
 
-      {/* Image element to display the bar chart */}
+      {/* Image element to display the combined bar chart */}
       {graphUrl && (
         <div className="chart-container">
           <h3>Emotion Predictions Bar Chart</h3>

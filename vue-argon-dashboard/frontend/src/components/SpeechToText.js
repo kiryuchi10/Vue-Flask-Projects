@@ -43,48 +43,37 @@ const SpeechToText = ({ onTextSubmit }) => {
   }
 
   const startRecording = async () => {
+    if (recording) return; // Prevent multiple start requests
     setRecording(true);
-    resetTranscript(); // Clear previous transcript when starting a new recording
+    resetTranscript();
     SpeechRecognition.startListening({ continuous: true });
 
-    // Trigger the backend to start recording
     try {
-      const res = await fetch("/start-recording", {
-        method: "POST",
-      });
-
-      if (!res.ok) {
-        console.error("Error starting recording:", await res.text());
+        const res = await fetch("/start-recording", { method: "POST" });
+        if (!res.ok) {
+            console.error("Error starting recording:", await res.text());
+            setRecording(false);
+        }
+    } catch (error) {
+        console.error("Fetch error:", error);
         setRecording(false);
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-      setRecording(false);
     }
-  };
+};
 
-  const stopRecording = async () => {
-    setRecording(false);
-    SpeechRecognition.stopListening();
+const stopRecording = async () => {
+  setRecording(false);
+  SpeechRecognition.stopListening();
 
-    // Trigger the backend to stop recording and predict the emotion
-    try {
-      const res = await fetch("/api/predict-voice", {
-        method: "POST",
-      });
-
+  try {
+      const res = await fetch("/stop-recording", { method: "POST" });
       if (!res.ok) {
-        console.error("Error stopping recording:", await res.text());
-        return;
+          console.error("Error stopping recording:", await res.text());
+          return;
       }
-
-      const data = await res.json();
-      setPredictedEmotion(data.emotion);
-    } catch (error) {
+  } catch (error) {
       console.error("Fetch error:", error);
-    }
-  };
-
+  }
+};
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>
       <ReactMic
