@@ -489,12 +489,13 @@ def generate_combined_bar_graph():
     image_dir = r"images"
     os.makedirs(image_dir, exist_ok=True)
 
-    # Save the plot to the images directory
+    # Save the plot to the images directory with a higher DPI
     image_path = os.path.join(image_dir, "combined_emotion_predictions.png")
-    plt.savefig(image_path, format="png")
+    plt.savefig(image_path, format="png", dpi=150)  # Save with 150 DPI for better quality when scaling
     plt.close()
 
     return image_path
+
 
 @app.route('/api/generate-graph', methods=['GET'])
 def generate_graph():

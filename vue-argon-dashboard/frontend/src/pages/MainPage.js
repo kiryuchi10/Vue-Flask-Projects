@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./MainPage.css"; // Import the CSS file
 import SpeechToText from "../components/SpeechToText"; // Import the SpeechToText component
 
@@ -88,7 +88,7 @@ const MainPage = () => {
       // Add the bot's response to the conversation
       setMessages((prevMessages) => [...prevMessages, botMessage]);
 
-      // Fetch the combined graph after predicting emotions
+      // Fetch the graph after predicting emotions
       fetchGraph();
     } catch (error) {
       console.error("Fetch error:", error);
@@ -164,7 +164,11 @@ const MainPage = () => {
       {graphUrl && (
         <div className="chart-container">
           <h3>Emotion Predictions Bar Chart</h3>
-          <img src={graphUrl} alt="Emotion Predictions Bar Chart" />
+          <img
+            src={graphUrl}
+            alt="Emotion Predictions Bar Chart"
+            style={{ width: "100%", height: "auto", maxWidth: "800px" }}
+          />
         </div>
       )}
     </div>
