@@ -1,9 +1,9 @@
+import os
 from flask import Flask, request, jsonify
 from transformers import pipeline
 import speech_recognition as sr
 from flask_cors import CORS
 from dotenv import load_dotenv
-import os
 import requests
 
 # Load environment variables from .env file
@@ -24,6 +24,10 @@ summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
 # Initialize speech recognition
 recognizer = sr.Recognizer()
 
+# Directory to save transcribed text files
+TRANSCRIPTIONS_DIR = "transcriptions"
+os.makedirs(TRANSCRIPTIONS_DIR, exist_ok=True)
+
 # Function to transcribe audio using Google's API
 def transcribe_audio(audio_file):
     try:
@@ -37,6 +41,12 @@ def transcribe_audio(audio_file):
         return "Request Error with Google Speech Recognition"
     except Exception as e:
         return str(e)
+
+# Function to save transcribed text as a .txt file
+def save_transcription(text, filename="transcription.txt"):
+    file_path = os.path.join(TRANSCRIPTIONS_DIR, filename)
+    with open(file_path, "w") as file:
+        file.write(text)
 
 # Function to search for restaurants using Google Places API
 def search_google_places(query, location="New York"):
@@ -100,11 +110,13 @@ def search_restaurants():
         if audio_file:
             # Convert voice to text if audio is provided
             transcript = transcribe_audio(audio_file)
+            save_transcription(transcript, filename="transcription.txt")  # Save transcription
             if "Request Error" in transcript:
                 return jsonify({'error': transcript}), 500
         elif text_input:
             # Use the provided text directly
             transcript = text_input
+            save_transcription(transcript, filename="transcription.txt")  # Save transcription
         else:
             return jsonify({'error': 'No audio or text provided'}), 400
 
