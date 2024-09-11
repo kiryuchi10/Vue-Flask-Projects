@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
@@ -8,6 +7,7 @@ import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
 import CalendarPage from './pages/Calendar'; // Update import
+import FavoritesPage from './pages/FavoritesPage'; // Import the FavoritesPage component
 import AppBarComponent from './components/AppBarComponent';
 import SideDrawer from './components/SideDrawer';
 import TodoPage from './pages/TodoPage';
@@ -57,6 +57,7 @@ const App = () => {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/calendar" element={<CalendarPage />} /> {/* Calendar page route */}
                 <Route path="/calendar/todo/:date" element={<TodoPage />} /> {/* To-do page route */}
+                <Route path="/favorites" element={<FavoritesPage />} /> {/* Favorites page route */}
               </Routes>
             </div>
             <BottomNav />

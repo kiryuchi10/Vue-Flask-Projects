@@ -1,0 +1,55 @@
+.transcription-container {
+    margin-top: 20px;
+  }
+  
+  .transcribed-text {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .record-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .process-btn {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .remove-btn {
+    background-color: #f44336;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .restaurant-results {
+    margin-top: 20px;
+  }
+  
+  .restaurant-results ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .restaurant-results li {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+  }
+  

@@ -19,6 +19,7 @@ const BottomNav = () => {
     navigate('/mainpagewithextras'); // Navigate to the MainPageWithExtras
   };
 
+  // Function to handle navigation when the Home icon is clicked
   const handleHomeClick = () => {
     navigate('/mainpage'); // Navigate to MainPage
   };
@@ -26,6 +27,11 @@ const BottomNav = () => {
   // Function to handle navigation when the Calendar icon is clicked
   const handleCalendarClick = () => {
     navigate('/calendar'); // Navigate to the Calendar page
+  };
+
+  // Function to handle navigation when the Favorites icon is clicked
+  const handleFavoritesClick = () => {
+    navigate('/favorites'); // Navigate to the Favorites page
   };
 
   return (
@@ -74,6 +80,7 @@ const BottomNav = () => {
       <BottomNavigationAction
         label="Favorites"
         icon={<FavoriteIcon />}
+        onClick={handleFavoritesClick} // Add click handler for Favorites
       />
       <BottomNavigationAction
         label="Profile"
