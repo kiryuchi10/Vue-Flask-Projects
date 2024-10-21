@@ -6,8 +6,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
-import CalendarPage from './pages/Calendar';
-import FavoritesPage from './pages/FavoritesPage';
+import CalendarPage from './pages/Calendar'; // Update import
+import FavoritesPage from './pages/FavoritesPage'; // Import the FavoritesPage component
 import AppBarComponent from './components/AppBarComponent';
 import SideDrawer from './components/SideDrawer';
 import TodoPage from './pages/TodoPage';
@@ -18,7 +18,7 @@ import SplashScreen from './components/SplashScreen';
 import RecentPages from './components/RecentPages';
 import Grid from './components/Grid';
 import { UserProvider } from './contexts/UserContext';
-import './Global.css';
+import './Global.css'; 
 
 const App = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -55,9 +55,9 @@ const App = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/calendar" element={<CalendarPage />} />
-                <Route path="/calendar/todo/:date" element={<TodoPage />} />
-                <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/calendar" element={<CalendarPage />} /> {/* Calendar page route */}
+                <Route path="/calendar/todo/:date" element={<TodoPage />} /> {/* To-do page route */}
+                <Route path="/favorites" element={<FavoritesPage />} /> {/* Favorites page route */}
               </Routes>
             </div>
             <BottomNav />
