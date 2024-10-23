@@ -1,56 +1,46 @@
-import os
-import pandas as pd
+# emotion_model.py
+import cv2
+import numpy as np
+from keras.models import load_model
 
+# Load a pre-trained emotion detection model
+model = load_model('path_to_your_emotion_model.h5')
 
-def extract_emotion_from_photo(path):
+def detect_emotion(image):
+    # Pre-process the image for emotion detection
+    gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+    faces = face_cascade.detectMultiScale(gray_image, 1.3, 5)
 
-    # path = "speech_emotion_recognition/data/"
-    actor_folders = os.listdir(path)
+    if len(faces) == 0:
+        return "No face detected", 0
+    
+    for (x, y, w, h) in faces:
+        face = gray_image[y:y+h, x:x+w]
+        face = cv2.resize(face, (48, 48))
+        face = face / 255.0
+        face = np.expand_dims(face, axis=0)
+        face = np.expand_dims(face, axis=-1)
 
-    file_path = []
-    actor = []
-    emotion = []
-    intensity = []
-    gender = []
+        # Predict the emotion
+        prediction = model.predict(face)
+        emotion_index = np.argmax(prediction)
+        emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
+        emotion = emotion_labels[emotion_index]
 
-    for i in actor_folders:
-        filename = os.listdir(path + i)
-        for f in filename:
-            file_path.append(path + i + "/" + f)
-            emotion.append(int(part[2]))
-            actor.append(int(part[6]))
-            intensity.append(int(part[3]))
-            bg = int(part[6])
-            if bg % 2 == 0:
-                bg = "female"
-            else:
-                bg = "male"
-            gender.append(bg)
+        # Assign a severity score (you can customize this logic)
+        severity = assign_severity(emotion)
+        
+        return emotion, severity
 
-    audio_df = pd.DataFrame(emotion)
-    audio_df = audio_df.replace(
-        {
-            1: "neutral",
-            2: "calm",
-            3: "happy",
-            4: "sad",
-            5: "angry",
-            6: "fearful",
-            7: "disgusted",
-            8: "surprised",
-        }
-    )
-    audio_df = pd.concat(
-        [pd.DataFrame(gender), audio_df, pd.DataFrame(intensity), pd.DataFrame(actor)],
-        axis=1,
-    )
-    audio_df.columns = ["gender", "emotion", "intensity", "actor"]
-    audio_df = pd.concat([audio_df, pd.DataFrame(file_path, columns=["path"])], axis=1)
-    audio_df.to_csv(
-        "./speech_emotion_recognition/features/df_features_new.csv", index=0
-    )
-
-def assess_lonely_death_serverity(self):
-    emotion=self.emotion
-
-extract_file_info(path="./speech_emotion_recognition/data/")
+def assign_severity(emotion):
+    severity_levels = {
+        'Angry': 3,
+        'Disgust': 2,
+        'Fear': 4,
+        'Happy': 1,
+        'Sad': 3,
+        'Surprise': 2,
+        'Neutral': 1
+    }
+    return severity_levels.get(emotion, 1)
