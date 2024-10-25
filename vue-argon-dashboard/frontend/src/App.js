@@ -6,19 +6,14 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import ProfilePage from './pages/ProfilePage';
-import CalendarPage from './pages/Calendar'; // Update import
-import FavoritesPage from './pages/FavoritesPage'; // Import the FavoritesPage component
+import CalendarPage from './pages/Calendar';
+import FavoritesPage from './pages/FavoritesPage';
 import AppBarComponent from './components/AppBarComponent';
 import SideDrawer from './components/SideDrawer';
 import TodoPage from './pages/TodoPage';
 import BottomNav from './components/BottomNavigationBar';
-import SearchBar from './components/SearchBar';
-import Carousel from './components/Carousel';
-import SplashScreen from './components/SplashScreen';
-import RecentPages from './components/RecentPages';
-import Grid from './components/Grid';
-import { UserProvider } from './contexts/UserContext';
-import './Global.css'; 
+import WebcamCapture from './components/WebcamCapture'; // Import the WebcamCapture component
+import './Global.css';
 
 const App = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
@@ -55,9 +50,10 @@ const App = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-                <Route path="/calendar" element={<CalendarPage />} /> {/* Calendar page route */}
-                <Route path="/calendar/todo/:date" element={<TodoPage />} /> {/* To-do page route */}
-                <Route path="/favorites" element={<FavoritesPage />} /> {/* Favorites page route */}
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/calendar/todo/:date" element={<TodoPage />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/services" element={<WebcamCapture />} /> {/* Services page with webcam */}
               </Routes>
             </div>
             <BottomNav />
@@ -67,32 +63,5 @@ const App = () => {
     </Router>
   );
 };
-
-const MainPageWithExtras = () => (
-  <>
-    <SearchBar />
-    <Grid />
-    <Carousel />
-    <RecentPages />
-  </>
-);
-
-const LoginPage = () => (
-  <div className="form">
-    <Login />
-  </div>
-);
-
-const SignupPage = () => (
-  <div className="form">
-    <Signup />
-  </div>
-);
-
-const ForgotPasswordPage = () => (
-  <div className="form">
-    <ForgotPassword />
-  </div>
-);
 
 export default App;

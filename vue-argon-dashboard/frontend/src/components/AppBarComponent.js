@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext'; // Adjust path as needed
+import { useUser } from '../contexts/UserContext';
 import './AppBar.css';
 
 const AppBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // Handle case where useUser might return null
-  const { user } = useUser() || {}; // Safe destructuring
+  const { user } = useUser() || {};
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
@@ -27,9 +25,12 @@ const AppBar = () => {
           &times;
         </button>
         <nav className="nav-links">
+          <div className="user-info">
+            {<p>Hello, {user?.user_name}</p>}
+          </div>
           <Link to="/mainpage">Home</Link>
           <Link to="/about">About</Link>
-          <Link to="/services">Services</Link>
+          <Link to="/services">Services</Link> {/* Link to Services */}
           <Link to="/contact">Contact</Link>
         </nav>
       </div>
