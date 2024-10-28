@@ -521,7 +521,7 @@ import base64
 import numpy as np
 from PIL import Image
 from io import BytesIO
-"""from emotion_model import detect_emotion  # Import your emotion detection function"""
+from emotion_model import detect_emotion  # Import your emotion detection function
 import speech_recognition as sr
 
 app = Flask(__name__)
@@ -532,15 +532,21 @@ def detect_emotion_route():
     try:
         # Get the image from the request
         data = request.get_json()
-        img_data = base64.b64decode(data['image'].split(',')[1])
+        if 'image' not in data:
+            return jsonify({"error": "No image data provided"}), 400
+        
+        # Extract and decode the base64 image data
+        img_data = data['image'].split(',')[1]  # Assuming 'data:image/...;base64,...' format
+        img_data = base64.b64decode(img_data)
         image = Image.open(BytesIO(img_data)).convert('RGB')
         image = np.array(image)
 
         # Process the image and detect emotion
-        emotion, severity = detect_emotion(image)
+        # Assuming `detect_emotion` is a function that processes the image
+        emotion, severity = detect_emotion(image)  # Replace with your actual emotion detection logic
         
         # Return the detected emotion and severity level
-        return jsonify({"emotion": emotion, "severity": severity})
+        return jsonify({"emotion": emotion, "severity": severity}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 

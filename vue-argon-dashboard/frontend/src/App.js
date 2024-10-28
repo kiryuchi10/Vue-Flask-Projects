@@ -12,8 +12,42 @@ import AppBarComponent from './components/AppBarComponent';
 import SideDrawer from './components/SideDrawer';
 import TodoPage from './pages/TodoPage';
 import BottomNav from './components/BottomNavigationBar';
-import WebcamCapture from './components/WebcamCapture'; // Import the WebcamCapture component
+import SearchBar from './components/SearchBar';
+import Carousel from './components/Carousel';
+import SplashScreen from './components/SplashScreen';
+import RecentPages from './components/RecentPages';
+import Grid from './components/Grid';
+import { UserProvider } from './contexts/UserContext';
+import WebcamCapture from './components/WebcamCapture';
 import './Global.css';
+
+// Define missing components
+const MainPageWithExtras = () => (
+  <>
+    <SearchBar />
+    <Grid />
+    <Carousel />
+    <RecentPages />
+  </>
+);
+
+const LoginPage = () => (
+  <div className="form">
+    <Login />
+  </div>
+);
+
+const SignupPage = () => (
+  <div className="form">
+    <Signup />
+  </div>
+);
+
+const ForgotPasswordPage = () => (
+  <div className="form">
+    <ForgotPassword />
+  </div>
+);
 
 const App = () => {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
