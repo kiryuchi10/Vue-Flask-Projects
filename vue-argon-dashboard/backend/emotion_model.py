@@ -1,11 +1,16 @@
 import cv2
 import mediapipe as mp
 import numpy as np
+import os
 from tensorflow.keras.models import load_model
 
-# Load pre-trained FER model
-model_path = "FER_model.h5"  # Update this with the correct path to your model
-fer_model = load_model(model_path)
+model_path = os.path.join(os.path.dirname(__file__), "models", "fer.h5")
+
+try:
+    fer_model = load_model(model_path)
+except ValueError as e:
+    raise ValueError(f"Error loading model from {model_path}: {e}")
+
 
 # Define emotion labels and assign a minimum threshold for display
 emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
@@ -79,6 +84,27 @@ def process_video(input_video_path, output_video_path):
     cap.release()
     out.release()
     cv2.destroyAllWindows()
+    
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+
+# Example architecture (replace with your actual model definition)
+model = Sequential([
+    Conv2D(32, (3, 3), activation='relu', input_shape=(48, 48, 1)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (3, 3), activation='relu'),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(7, activation='softmax')  # 7 classes for emotion detection
+])
+
+model.load_weights("C:/Users/user/Downloads/my-ai-app/vue-argon-dashboard/backend/models/fer.h5")
+
+model.save("C:/Users/user/Downloads/my-ai-app/vue-argon-dashboard/backend/models/fer_fixed.h5")
+
 
 if __name__ == "__main__":
     input_video = "nosubs.mp4"  # Path to the input video

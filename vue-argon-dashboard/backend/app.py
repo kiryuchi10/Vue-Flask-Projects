@@ -525,7 +525,7 @@ from emotion_model import detect_emotion  # Import your emotion detection functi
 import speech_recognition as sr
 
 app = Flask(__name__)
-CORS(app)
+CORS(app) #Cross origin ...
 
 @app.route('/detect_emotion', methods=['POST'])
 def detect_emotion_route():
